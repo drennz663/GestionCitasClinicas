@@ -67,4 +67,12 @@ public class Medico {
         }
         this.especialidad = especialidad;
     }
+
+    public void modificardatos(){
+
+    }// fin de la clase modificar datos
+
+
+
+
 }
