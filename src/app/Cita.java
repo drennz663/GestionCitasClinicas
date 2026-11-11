@@ -1,45 +1,60 @@
 package app;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class Cita {
 
-    private static int contador = 0;
-
-    private String codigo;
+    private int idCita;
     private Paciente paciente;
-    private Horario horario;
-    private EstadoCita estado;
+    private Turno turno;
+    private String estado;
 
-    public Cita(Paciente paciente, Horario horario) {
+    public Cita(Paciente paciente, Turno turno, String estado) {
         setPaciente(paciente);
-        if (horario == null) {
-            throw new IllegalArgumentException("Horario obligatorio");
-        }
-        horario.reservar();
-        this.horario = horario;
-        this.estado = EstadoCita.PENDIENTE;
-        this.codigo = String.format("CIT%03d", ++contador);
+        setTurno(turno);
+        setEstado(estado);
     }
 
-    public String getCodigo() {
-        return codigo;
+
+    public int getIdCita() {
+        return idCita;
     }
 
     public Paciente getPaciente() {
         return paciente;
     }
 
-    public Horario getHorario() {
-        return horario;
+    public Turno getTurno() {
+        return turno;
+    }
+
+    public String getEstado() {
+        return estado;
     }
 
     public Medico getMedico() {
-        return horario.getMedico();
+        return turno.getHorario().getMedico();
     }
 
-    public EstadoCita getEstado() {
-        return estado;
+    public Consultorio getConsultorio() {
+        return turno.getHorario().getConsultorio();
+    }
+
+    public LocalDate getFecha() {
+        return turno.getFecha();
+    }
+
+    public LocalTime getHora() {
+        return turno.getHoraInicio();
+    }
+    
+
+    public void setIdCita(int idCita) {
+        if (idCita <= 0) {
+            throw new IllegalArgumentException("ID de cita invalido");
+        }
+        this.idCita = idCita;
     }
 
     public void setPaciente(Paciente paciente) {
@@ -49,46 +64,24 @@ public class Cita {
         this.paciente = paciente;
     }
 
-    public void setEstado(EstadoCita estado) {
-        if (estado == null) {
-            throw new IllegalArgumentException("Estado obligatorio");
+    public void setTurno(Turno turno) {
+        if (turno == null) {
+            throw new IllegalArgumentException("Turno obligatorio");
         }
-        if (estado == EstadoCita.CANCELADA) {
-            horario.liberar();
+        this.turno = turno;
+    }
+
+    public void setEstado(String estado) {
+        if (estado == null ||
+            (!estado.equals("PROGRAMADA") &&
+             !estado.equals("CONFIRMADA") &&
+             !estado.equals("ATENDIDA") &&
+             !estado.equals("CANCELADA") &&
+             !estado.equals("NO ASISTIO"))) {
+
+            throw new IllegalArgumentException("Estado de cita invalido");
         }
+
         this.estado = estado;
     }
-
-    // RF-25: filtrar las citas por estado
-    public static void filtrarCitasPorEstado(ArrayList<Cita> citas) {
-        EstadoCita[] estados = EstadoCita.values();
-        for (int i = 0; i < estados.length; i++) {
-            System.out.println((i + 1) + ". " + estados[i]);
-        }
-
-        int opcion = Principal.leerEntero("Seleccione un estado: ");
-        if (opcion < 1 || opcion > estados.length) {
-            System.out.println("Estado no valido");
-            return;
-        }
-
-        EstadoCita estado = estados[opcion - 1];
-        boolean hay = false;
-        for (Cita c : citas) {
-            if (c.estado == estado) {
-                System.out.println(c.codigo + " | " + c.paciente.getNombres() + " " + c.paciente.getApellidoPaterno()
-                        + " | " + c.getMedico().getNombresMedico() + " " + c.getMedico().getApellidosMedico()
-                        + " | " + c.horario.getFecha() + " " + c.horario.getHora());
-                hay = true;
-            }
-        }
-        if (!hay) {
-            System.out.println("No hay citas en este estado");
-        }
-    }
 }
-
-
-
-
-

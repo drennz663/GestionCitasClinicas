@@ -1,100 +1,83 @@
+
 package app;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
+import java.util.Objects;
 
 public class Horario {
 
-    private static int contador = 0;
-
-    private String codigo;
+    private int idHorario;
     private Medico medico;
-    private LocalDate fecha;
-    private LocalTime hora;
-    private boolean disponible;
+    private Consultorio consultorio;
+    private int diaSemana;
+    private LocalTime horaInicio;
+    private LocalTime horaFin;
 
-    public Horario(Medico medico, LocalDate fecha, LocalTime hora) {
+    public Horario(Medico medico, Consultorio consultorio, int diaSemana, LocalTime horaInicio, LocalTime horaFin) {
         setMedico(medico);
-        setFecha(fecha);
-        setHora(hora);
-        this.disponible = true;
-        this.codigo = String.format("HOR%03d", ++contador);
+        setConsultorio(consultorio);
+        setDiaSemana(diaSemana);
+        setHoras(horaInicio, horaFin);
     }
 
-    public String getCodigo() {
-        return codigo;
+    public int getIdHorario() {
+        return idHorario;
     }
+
+    public void setIdHorario(int idHorario) {
+        if (idHorario <= 0)
+            throw new IllegalArgumentException("IdHorario invalido");
+
+        this.idHorario = idHorario;
+    }
+
     public Medico getMedico() {
         return medico;
     }
-    public LocalDate getFecha() {
-        return fecha;
-    }
-    public LocalTime getHora() {
-        return hora;
-    }
-    public boolean isDisponible() {
-        return disponible;
-    }
 
     public void setMedico(Medico medico) {
-        if (medico == null) {
-            throw new IllegalArgumentException("Médico obligatorio");
-        }
-        this.medico = medico;
+        this.medico = Objects.requireNonNull(medico, "Medico obligatorio");
     }
 
-    public void setFecha(LocalDate fecha) {
-        if (fecha == null) {
-            throw new IllegalArgumentException("Fecha obligatoria");
-        }
-        this.fecha = fecha;
+    public Consultorio getConsultorio() {
+        return consultorio;
     }
 
-    public void setHora(LocalTime hora) {
-        if (hora == null) {
-            throw new IllegalArgumentException("Hora obligatoria");
-        }
-        this.hora = hora;
+    public void setConsultorio(Consultorio consultorio) {
+        this.consultorio = Objects.requireNonNull( consultorio, "Consultorio obligatorio");
     }
 
-    public void reservar() {
-        if (!disponible) {
-            throw new IllegalStateException("El horario ya está reservado");
-        }
-        this.disponible = false;
+    public int getDiaSemana() {
+        return diaSemana;
     }
 
-    public void liberar() {
-        this.disponible = true;
+    public void setDiaSemana(int diaSemana) {
+        if (diaSemana < 1 || diaSemana > 7)
+            throw new IllegalArgumentException("DiaSemana debe estar entre 1 y 7");
+
+        this.diaSemana = diaSemana;
     }
 
-    // RF-15: consultar horarios disponibles por especialidad
-    public static void consultarDisponiblesPorEspecialidad(ArrayList<Horario> horarios, ArrayList<Especialidad> especialidades) {
-        for (int i = 0; i < especialidades.size(); i++) {
-            System.out.println((i + 1) + ". " + especialidades.get(i).getDescripcion());
+    public String getNombreDia() {
+        String[] dias = {"Lunes", "Martes", "Miercoles","Jueves", "Viernes", "Sabado", "Domingo"};
+
+        return dias[diaSemana - 1];
+    }
+
+    public LocalTime getHoraInicio() {
+        return horaInicio;
+    }
+
+    public LocalTime getHoraFin() {
+        return horaFin;
+    }
+
+    public void setHoras(LocalTime horaInicio, LocalTime horaFin) {
+        if (horaInicio == null || horaFin == null || !horaInicio.isBefore(horaFin)) {
+            throw new IllegalArgumentException("Rango de horas invalido");
         }
 
-        int opcion = Principal.leerEntero("Seleccione una especialidad: ");
-        if (opcion < 1 || opcion > especialidades.size()) {
-            System.out.println("Especialidad no valida");
-            return;
-        }
-
-        Especialidad especialidad = especialidades.get(opcion - 1);
-        boolean hay = false;
-        for (Horario h : horarios) {
-            if (h.disponible && h.medico.getEspecialidad() == especialidad) {
-                System.out.println(h.codigo + " | " + h.fecha + " " + h.hora + " | "
-                        + h.medico.getNombresMedico() + " " + h.medico.getApellidosMedico());
-                hay = true;
-            }
-        }
-        if (!hay) {
-            System.out.println("No hay horarios disponibles");
-        }
+        this.horaInicio = horaInicio;
+        this.horaFin = horaFin;
     }
 }
-
-

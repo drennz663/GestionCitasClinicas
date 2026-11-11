@@ -1,129 +1,79 @@
 
 package app;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.List;
 
-import static app.Principal.sc;
+public class Medico extends Persona {
 
-public class Medico {
+	private int idMedico;
+	private String cmp;
+	private List<Especialidad> especialidades;
 
-    private static int contador = 0;
+	public Medico(String dni, String nombres, String apellidoPaterno, String apellidoMaterno, LocalDate fechaNacimiento, String sexo, String cmp) {
+		super(dni, nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento, sexo);
+		setCmp(cmp);
+		this.especialidades = new ArrayList<>();
+	}
 
-    private String codigo;
-    private String cmp;
-    private String nombresMedico;
-    private String apellidosMedico;
-    private Especialidad especialidad;
+	public int getIdMedico() {
+		return idMedico;
+	}
 
-    public Medico(String cmp, String nombresMedico, String apellidosMedico, Especialidad especialidad) {
+	public void setIdMedico(int idMedico) {
+		if (idMedico <= 0) {
+			throw new IllegalArgumentException("ID de medico invalido");
+		}
+		this.idMedico = idMedico;
+	}
 
-        setCmp(cmp);
-        setNombresMedico(nombresMedico);
-        setApellidosMedico(apellidosMedico);
-        setEspecialidad(especialidad);
-        this.codigo = String.format("MED%03d", ++contador);
+	public String getCmp() {
+		return cmp;
+	}
+
+	public void setCmp(String cmp) {
+		if (cmp == null || cmp.isBlank()) {
+			throw new IllegalArgumentException("CMP obligatorio");
+		}
+		this.cmp = cmp;
+	}
+
+	public List<Especialidad> getEspecialidades() {
+		return List.copyOf(especialidades);
+	}
+
+	public void setEspecialidades(List<Especialidad> especialidades) {
+	    if (especialidades == null) {
+	        throw new IllegalArgumentException("La lista de especialidades no puede ser nula"
+	        );
+	    }
+	    if (especialidades.contains(null)) {
+	        throw new IllegalArgumentException("La lista no puede contener especialidades nulas"
+	        );
+	    }
+	    this.especialidades = new ArrayList<>(
+	        new java.util.LinkedHashSet<>(especialidades)
+	    );
+	}
+	
+	public void agregarEspecialidad(Especialidad especialidad) {
+
+		if (especialidad == null) {
+			throw new IllegalArgumentException("Especialidad obligatoria");
+		}
+
+		if (!especialidades.contains(especialidad)) {
+			especialidades.add(especialidad);
+		}
+	}
+
+    @Override
+    public String mostrarInformacion() {
+        return "MEDICO: " + getNombreCompleto()
+             + " | DNI: " + getDni()
+             + " | CMP: " + cmp
+             + " | Especialidades: "
+             + especialidades.size();
     }
-
-    public String getCodigo() {
-        return codigo;
-    }
-
-    public String getCmp() {
-        return cmp;
-    }
-
-    public String getNombresMedico() {
-        return nombresMedico;
-    }
-
-    public String getApellidosMedico() {
-        return apellidosMedico;
-    }
-
-    public Especialidad getEspecialidad() {
-        return especialidad;
-    }
-
-    public void setCmp(String cmp) {
-        if (cmp == null || cmp.isBlank()) {
-            throw new IllegalArgumentException("CMP vacío");
-        }
-        this.cmp = cmp;
-    }
-
-    public void setNombresMedico(String nombresMedico) {
-        if (nombresMedico == null || nombresMedico.isBlank()) {
-            throw new IllegalArgumentException("Nombres vacíos");
-        }
-        this.nombresMedico = nombresMedico;
-    }
-
-    public void setApellidosMedico(String apellidosMedico) {
-        if (apellidosMedico == null || apellidosMedico.isBlank()) {
-            throw new IllegalArgumentException("Apellidos vacíos");
-        }
-        this.apellidosMedico = apellidosMedico;
-    }
-
-    public void setEspecialidad(Especialidad especialidad) {
-        if (especialidad == null) {
-            throw new IllegalArgumentException("Debe seleccionar una especialidad");
-        }
-        this.especialidad = especialidad;
-    }
-
-    public void modificarDatos(Scanner sc, ArrayList<Especialidad> especialidades) {
-        try {
-            System.out.print("Nuevo CMP: ");
-            setCmp(sc.nextLine());
-
-            System.out.print("Nuevos nombres: ");
-            setNombresMedico(sc.nextLine());
-
-            System.out.print("Nuevos apellidos: ");
-            setApellidosMedico(sc.nextLine());
-
-            for (int i = 0; i < especialidades.size(); i++) {
-                System.out.println((i + 1) + ". " + especialidades.get(i).getDescripcion());
-            }
-            System.out.print("Numero de especialidad: ");
-            setEspecialidad(especialidades.get(Integer.parseInt(sc.nextLine()) - 1));
-
-            System.out.println("Medico actualizado");
-        } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
-            System.out.println("Dato invalido, revise lo ingresado");
-        }
-    }
-
-    public static void modificarMedico(Scanner sc, ArrayList<Medico> medicos, ArrayList<Especialidad> especialidades) {
-        if (medicos.isEmpty()) {
-            System.out.println("No hay medicos registrados");
-            return;
-        }
-
-        System.out.println("\n--- Medicos ---");
-        for (Medico m : medicos) {
-            System.out.println(m.codigo + " | CMP " + m.cmp + " | " + m.nombresMedico + " "
-                    + m.apellidosMedico + " | " + m.especialidad.getDescripcion());
-        }
-
-        System.out.print("Codigo del medico a modificar: ");
-        String buscado = sc.nextLine().trim();
-        for (Medico m : medicos) {
-            if (m.codigo.equalsIgnoreCase(buscado)) {
-                m.modificarDatos(sc, especialidades);
-                return;
-            }
-        }
-        System.out.println("Medico no encontrado");
-    }//final de la clase
-
-
-
-
-
-
-
-
 }
