@@ -17,6 +17,8 @@ public class Principal {
     static ArrayList<Medicamento> medicamentos = new ArrayList<>();
     static ArrayList<Atencion> atenciones = new ArrayList<>();
     static ArrayList<Receta> recetas = new ArrayList<>();
+    static ArrayList<Horario> horarios = new ArrayList<>();
+    static ArrayList<Cita> citas = new ArrayList<>();
 
     public static void main(String[] args) {
         int opcion;
@@ -28,6 +30,7 @@ public class Principal {
             System.out.println("4. Gestion de Seguros");
             System.out.println("5. Gestion de Consultorios");
             System.out.println("6. Gestion de Atenciones");
+            System.out.println("7. Gestion de Citas");
             System.out.println("0. Salir");
             opcion = leerEntero("Opcion: ");
 
@@ -49,6 +52,8 @@ public class Principal {
                     break;
                 case 6:
                     gestionAtenciones();
+                case 7:
+                    gestionCitas();
                     break;
                 case 0:
                     System.out.println("Fin del programa");
@@ -92,6 +97,7 @@ public class Principal {
             System.out.println("\n=== GESTION DE MEDICOS ===");
             System.out.println("1. Registrar medico");
             System.out.println("2. Listar medicos");
+            System.out.println("3. Modificar medico");
             System.out.println("0. Volver");
             opcion = leerEntero("Opcion: ");
 
@@ -102,6 +108,8 @@ public class Principal {
                 case 2:
                     //Medico.listarMedicos(medicos);
                     break;
+                case 3:
+                    Medico.modificarMedico(sc, medicos, especialidades);
                 case 0:
                     break;
                 default:
@@ -205,6 +213,30 @@ public class Principal {
                     break;
                 case 3:
                     //verDetalleAtencion();
+                    break;
+                case 0:
+                    break;
+                default:
+                    System.out.println("Opcion no valida");
+            }
+        } while (opcion != 0);
+    }
+
+    public static void gestionCitas() {
+        int opcion;
+        do {
+            System.out.println("\n=== GESTION DE CITAS ===");
+            System.out.println("1. Filtrar citas por estado");
+            System.out.println("2. Consultar horarios disponibles por especialidad");
+            System.out.println("0. Volver");
+            opcion = leerEntero("Opcion: ");
+
+            switch (opcion) {
+                case 1:
+                    Cita.filtrarCitasPorEstado(citas);
+                    break;
+                case 2:
+                    Horario.consultarDisponiblesPorEspecialidad(horarios, especialidades);
                     break;
                 case 0:
                     break;

@@ -1,6 +1,11 @@
 
 package app;
 
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import static app.Principal.sc;
+
 public class Medico {
 
     private static int contador = 0;
@@ -68,9 +73,55 @@ public class Medico {
         this.especialidad = especialidad;
     }
 
-    public void modificardatos(){
+    public void modificarDatos(Scanner sc, ArrayList<Especialidad> especialidades) {
+        try {
+            System.out.print("Nuevo CMP: ");
+            setCmp(sc.nextLine());
 
-    }// fin de la clase modificar datos
+            System.out.print("Nuevos nombres: ");
+            setNombresMedico(sc.nextLine());
+
+            System.out.print("Nuevos apellidos: ");
+            setApellidosMedico(sc.nextLine());
+
+            for (int i = 0; i < especialidades.size(); i++) {
+                System.out.println((i + 1) + ". " + especialidades.get(i).getDescripcion());
+            }
+            System.out.print("Numero de especialidad: ");
+            setEspecialidad(especialidades.get(Integer.parseInt(sc.nextLine()) - 1));
+
+            System.out.println("Medico actualizado");
+        } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+            System.out.println("Dato invalido, revise lo ingresado");
+        }
+    }
+
+    public static void modificarMedico(Scanner sc, ArrayList<Medico> medicos, ArrayList<Especialidad> especialidades) {
+        if (medicos.isEmpty()) {
+            System.out.println("No hay medicos registrados");
+            return;
+        }
+
+        System.out.println("\n--- Medicos ---");
+        for (Medico m : medicos) {
+            System.out.println(m.codigo + " | CMP " + m.cmp + " | " + m.nombresMedico + " "
+                    + m.apellidosMedico + " | " + m.especialidad.getDescripcion());
+        }
+
+        System.out.print("Codigo del medico a modificar: ");
+        String buscado = sc.nextLine().trim();
+        for (Medico m : medicos) {
+            if (m.codigo.equalsIgnoreCase(buscado)) {
+                m.modificarDatos(sc, especialidades);
+                return;
+            }
+        }
+        System.out.println("Medico no encontrado");
+    }//final de la clase
+
+
+
+
 
 
 
