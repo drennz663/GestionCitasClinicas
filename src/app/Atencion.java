@@ -1,90 +1,110 @@
-
 package app;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Atencion {
 
-    private static int contador = 0;
-    private String codigo;
+    private int idAtencion;
+    private Cita cita;
     private LocalDate fechaAtencion;
-    private Paciente paciente;
-    private Medico medico;
-    private Consultorio consultorio;
-    private Diagnostico diagnostico;
     private String motivo;
+    private List<Diagnostico> diagnosticos;
 
-    public Atencion(LocalDate fechaAtencion, Paciente paciente, Medico medico, Consultorio consultorio, Diagnostico diagnostico, String motivo) {
+    public Atencion(Cita cita, LocalDate fechaAtencion, String motivo) {
+        setCita(cita);
         setFechaAtencion(fechaAtencion);
-        setPaciente(paciente);
-        setMedico(medico);
-        setConsultorio(consultorio);
-        setDiagnostico(diagnostico);
         setMotivo(motivo);
-        this.codigo = String.format("ATE%03d", ++contador);
+        this.diagnosticos = new ArrayList<>();
     }
 
-    public String getCodigo() {
-        return codigo;
+    public int getIdAtencion() {
+        return idAtencion;
     }
+
+    public Cita getCita() {
+        return cita;
+    }
+
     public LocalDate getFechaAtencion() {
         return fechaAtencion;
     }
-    public Paciente getPaciente() {
-        return paciente;
-    }
-    public Medico getMedico() {
-        return medico;
-    }
-    public Consultorio getConsultorio() {
-        return consultorio;
-    }
-    public Diagnostico getDiagnostico() {
-        return diagnostico;
-    }
+
     public String getMotivo() {
         return motivo;
     }
 
+    public List<Diagnostico> getDiagnosticos() {
+        return List.copyOf(diagnosticos);
+    }
+
+    public Paciente getPaciente() {
+        return cita.getPaciente();
+    }
+
+    public Medico getMedico() {
+        return cita.getMedico();
+    }
+
+    public Consultorio getConsultorio() {
+        return cita.getConsultorio();
+    }
+
+
+    public void setIdAtencion(int idAtencion) {
+        if (idAtencion <= 0) {
+            throw new IllegalArgumentException("ID de atencion invalido");
+        }
+        this.idAtencion = idAtencion;
+    }
+
+    public void setCita(Cita cita) {
+        if (cita == null) {
+            throw new IllegalArgumentException("Cita obligatoria");
+        }
+        this.cita = cita;
+    }
+
     public void setFechaAtencion(LocalDate fechaAtencion) {
         if (fechaAtencion == null || fechaAtencion.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Fecha de atención inválida");
+            throw new IllegalArgumentException("Fecha de atencion invalida");
         }
+
         this.fechaAtencion = fechaAtencion;
-    }
-
-    public void setPaciente(Paciente paciente) {
-        if (paciente == null) {
-            throw new IllegalArgumentException("Paciente obligatorio");
-        }
-        this.paciente = paciente;
-    }
-
-    public void setMedico(Medico medico) {
-        if (medico == null) {
-            throw new IllegalArgumentException("Médico obligatorio");
-        }
-        this.medico = medico;
-    }
-
-    public void setConsultorio(Consultorio consultorio) {
-        if (consultorio == null) {
-            throw new IllegalArgumentException("Consultorio obligatorio");
-        }
-        this.consultorio = consultorio;
-    }
-
-    public void setDiagnostico(Diagnostico diagnostico) {
-        if (diagnostico == null) {
-            throw new IllegalArgumentException("Diagnóstico obligatorio");
-        }
-        this.diagnostico = diagnostico;
     }
 
     public void setMotivo(String motivo) {
         if (motivo == null || motivo.isBlank()) {
-            throw new IllegalArgumentException("Motivo vacío");
+            throw new IllegalArgumentException("Motivo obligatorio");
         }
-        this.motivo = motivo;
+        this.motivo = motivo.trim();
+    }
+
+    public void setDiagnosticos(List<Diagnostico> diagnosticos) {
+        if (diagnosticos == null) {
+            throw new IllegalArgumentException("Lista de diagnosticos obligatoria");
+        }
+
+        this.diagnosticos = new ArrayList<>(diagnosticos);
+    }
+
+
+    public void agregarDiagnostico(Diagnostico diagnostico) {
+        if (diagnostico == null) {
+            throw new IllegalArgumentException("Diagnostico obligatorio");
+        }
+
+        if (!diagnosticos.contains(diagnostico)) {
+            diagnosticos.add(diagnostico);
+        }
+    }
+
+    public void quitarDiagnostico(Diagnostico diagnostico) {
+        if (diagnostico == null) {
+            throw new IllegalArgumentException("Diagnostico obligatorio");
+        }
+
+        diagnosticos.remove(diagnostico);
     }
 }

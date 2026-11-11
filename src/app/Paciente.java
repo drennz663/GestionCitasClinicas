@@ -1,119 +1,82 @@
-
 package app;
 
 import java.time.LocalDate;
 
+public class Paciente extends Persona {
 
-public class Paciente {
-
-    private static int contador = 0;
-
-    private String codigo;
-    private String dni;
-    private String nombres;
-    private String apellidoPaterno;
-    private String apellidoMaterno;
-    private LocalDate fechaNacimiento;
-    private String sexo;
+    private int idPaciente;
     private String direccion;
+    private String telefono;
+    private String correo;
     private Seguro seguro;
 
-    public Paciente(String dni, String nombres, String apellidoPaterno, String apellidoMaterno, LocalDate fechaNacimiento, String sexo, String direccion, Seguro seguro) {
-
-        setDni(dni);
-        setNombres(nombres);
-        setApellidoPaterno(apellidoPaterno);
-        setApellidoMaterno(apellidoMaterno);
-        setFechaNacimiento(fechaNacimiento);
-        setSexo(sexo);
+    public Paciente(String dni, String nombres, String apellidoPaterno, String apellidoMaterno, LocalDate fechaNacimiento, String sexo, String direccion, String telefono, String correo, Seguro seguro) {
+        super(dni, nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento, sexo);
         setDireccion(direccion);
+        setTelefono(telefono);
+        setCorreo(correo);
         setSeguro(seguro);
-        this.codigo = String.format("PAC%03d", ++contador);
     }
 
-    public String getCodigo() {
-        return codigo;
+    public int getIdPaciente() {
+        return idPaciente;
     }
 
-    public String getDni() {
-        return dni;
+    public void setIdPaciente(int idPaciente) {
+        if (idPaciente <= 0) {
+            throw new IllegalArgumentException("ID de paciente invalido");
+        }
+        this.idPaciente = idPaciente;
     }
-    public String getNombres() {
-        return nombres;
-    }
-    public String getApellidoPaterno() {
-        return apellidoPaterno;
-    }
-    public String getApellidoMaterno() {
-        return apellidoMaterno;
-    }
-    public LocalDate getFechaNacimiento() {
-        return fechaNacimiento;
-    }
-    public String getSexo() {
-        return sexo;
-    }
+
     public String getDireccion() {
         return direccion;
-    }
-    public Seguro getSeguro() {
-        return seguro;
-    }
-
-    public void setDni(String dni) {
-        if (dni == null || !dni.matches("\\d{8}")) {
-            throw new IllegalArgumentException("El DNI debe tener 8 dígitos");
-        }
-        this.dni = dni;
-    }
-
-    public void setNombres(String nombres) {
-        if (nombres == null || nombres.isBlank()) {
-            throw new IllegalArgumentException("Nombres vacíos");
-        }
-        this.nombres = nombres;
-    }
-
-    public void setApellidoPaterno(String apellidoPaterno) {
-        if (apellidoPaterno == null || apellidoPaterno.isBlank()) {
-            throw new IllegalArgumentException("Apellido paterno vacío");
-        }
-        this.apellidoPaterno = apellidoPaterno;
-    }
-
-    public void setApellidoMaterno(String apellidoMaterno) {
-        if (apellidoMaterno == null || apellidoMaterno.isBlank()) {
-            throw new IllegalArgumentException("Apellido materno vacío");
-        }
-        this.apellidoMaterno = apellidoMaterno;
-    }
-
-    public void setFechaNacimiento(LocalDate fechaNacimiento) {
-        if (fechaNacimiento == null || fechaNacimiento.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Fecha de nacimiento inválida");
-        }
-        this.fechaNacimiento = fechaNacimiento;
-    }
-
-    public void setSexo(String sexo) {
-        if (sexo == null ||
-                (!sexo.equalsIgnoreCase("M") && !sexo.equalsIgnoreCase("F"))) {
-            throw new IllegalArgumentException("Sexo debe ser M o F");
-        }
-        this.sexo = sexo.toUpperCase();
     }
 
     public void setDireccion(String direccion) {
         if (direccion == null || direccion.isBlank()) {
-            throw new IllegalArgumentException("Dirección vacía");
+            throw new IllegalArgumentException("Direccion obligatoria");
         }
         this.direccion = direccion;
     }
 
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        if (telefono == null || telefono.isBlank()) {
+            throw new IllegalArgumentException("Telefono obligatorio");
+        }
+        this.telefono = telefono;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        if (correo == null || correo.isBlank()) {
+            throw new IllegalArgumentException("Correo obligatorio");
+        }
+        this.correo = correo;
+    }
+
+    public Seguro getSeguro() {
+        return seguro;
+    }
+
     public void setSeguro(Seguro seguro) {
         if (seguro == null) {
-            throw new IllegalArgumentException("Debe seleccionar un seguro");
+            throw new IllegalArgumentException("Seguro obligatorio");
         }
         this.seguro = seguro;
+    }
+
+    @Override
+    public String mostrarInformacion() {
+        return "PACIENTE: " + getNombreCompleto()
+             + " | DNI: " + getDni()
+             + " | Seguro: " + seguro.getNombreSeguro();
     }
 }
