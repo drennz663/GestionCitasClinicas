@@ -1,7 +1,10 @@
-
 package app;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Principal {
@@ -25,6 +28,7 @@ public class Principal {
 
     public static void main(String[] args) {
         int opcion;
+        cargarDatosPrueba();
 
         do {
             System.out.println("\n========== SISTEMA CLINICO ==========");
@@ -329,9 +333,11 @@ public class Principal {
                     break;
                 case 2:
                     // listarCitas();
+                    listarPorFecha();
                     break;
                 case 3:
                     // confirmarCita();
+                    confirmarCita();
                     break;
                 case 4:
                     // cancelarCita();
@@ -517,5 +523,210 @@ public class Principal {
                 System.out.println("Ingrese un numero valido");
             }
         }
+    }
+
+    // VALIDAR ENTRADA DE FECHA
+    public static LocalDate leerFecha(String mensaje) {
+        while (true) {
+            System.out.print(mensaje);
+
+            try {
+                return LocalDate.parse(sc.nextLine().trim());
+            } catch (DateTimeParseException e) {
+                System.out.println("Ingrese una fecha valida (AAAA-MM-DD)");
+            }
+        }
+    }
+
+    public static void confirmarCita() {
+        int id;
+        int opcion;
+        id = leerEntero("Ingresa el ID de la cita a confirmar : ");
+        for(int x = 0; x < citas.size(); x++) {
+            Cita citaObtenida = citas.get(x);
+            if (citaObtenida.getIdCita() == id) {
+                if(Objects.equals(citaObtenida.getEstado(), "CONFIRMADA")){
+                    System.out.println("La cita ya esta confirmada...");
+                    return;
+                }
+                System.out.println("¿Estás seguro de que quieres confirmar esta cita? " + citaObtenida.getIdCita() + " de estado actual : " + citaObtenida.getEstado());
+                System.out.println("1. Sí, confirmar cita");
+                System.out.println("2. He escrito el ID incorrectamente");
+                opcion = leerEntero("Opción: ");
+                switch (opcion) {
+                    case 1:
+                        citaObtenida.setEstado("CONFIRMADA");
+                        System.out.println("La cita ha sido confirmada satisfactoriamente");
+                        break;
+                    case 2:
+                        System.out.println("Operación cancelada");
+                        break;
+                    case 0:
+                        break;
+                    default:
+                        System.out.println("Opción no válida");
+                }
+                return;
+            }
+        }
+        System.out.println("No se encontró ninguna cita con ese ID");
+    }
+
+    public static void listarPorFecha(){
+        int opcion;
+        LocalDate fecha;
+        LocalDate otraFecha;
+        fecha = leerFecha("Ingresa la fecha a buscar : ");
+        System.out.println("Deseas añadir una segunda fecha?");
+        System.out.println("1. Sii!");
+        System.out.println("2. Ehh....mejor no");
+        opcion = leerEntero("Ingresa una opcion : ");
+        switch (opcion) {
+            case 1 :
+                boolean encontrado = false;
+                otraFecha = leerFecha("Ingresa la fecha a buscar : ");
+                if (fecha.isAfter(otraFecha)) {
+                    System.out.println("La fecha inicial no puede ser posterior a la final");
+                    return;
+                }
+                for (int x = 0;x < citas.size(); x++){
+                    Cita citaObtenida = citas.get(x);
+                    if (!citaObtenida.getFecha().isBefore(fecha) &&
+                            !citaObtenida.getFecha().isAfter(otraFecha)) {
+                        encontrado = true;
+                        System.out.println("ID: " + citaObtenida.getIdCita());
+                        System.out.println("Paciente: " + citaObtenida.getPaciente().getNombres());
+                        System.out.println("Fecha: " + citaObtenida.getFecha());
+                        System.out.println("Hora: " + citaObtenida.getHora());
+                    }
+                }
+                if(!encontrado){
+                    System.out.println("No hay ninguna cita establecida/realizada en esa fecha");
+                }
+                break;
+            case 2 :
+                boolean encontradoAgain = false;
+                for (int x = 0; x < citas.size(); x++) {
+                    Cita citaObtenida = citas.get(x);
+                    if (citaObtenida.getFecha().equals(fecha)) {
+                        encontradoAgain = true;
+                        System.out.println("ID: " + citaObtenida.getIdCita());
+                        System.out.println("Paciente: " + citaObtenida.getPaciente().getNombres());
+                        System.out.println("Fecha: " + citaObtenida.getFecha());
+                        System.out.println("Hora: " + citaObtenida.getHora());
+                    }
+                }
+                if(!encontradoAgain){
+                    System.out.println("No hay ninguna cita establecida/realizada en esas fechas");
+                }
+                break;
+            case 0 :
+                System.out.println("Operacion cancelada");
+                break;
+            default:
+                System.out.println("Opción no válida");
+        }
+    }
+
+    //Aqui dejo el RF-18, eeeh lo aplicas y/o adaptas a la creacion de citas, no me toco hacer eso Dx
+    //EEH, pequeño disclaimer, las variables que estoy usando (DNIIngresado, por ejemplo) son variables
+    //que he utilizado para pruebas, reemplazalas con las variables que estas usando en la creacion de
+    //citas ;0. Guiate del "Se procede con la creacion", porque ahi es donde deberia continuar la creacion
+    //de la cita! estoo...nada mas, bye! (mensaje a quien le haya tocado hacer la creacion de citas)
+    /*
+            for(int x=0;x<citas.size();x++){
+                Cita citaObtenida = citas.get(x);
+                if(citaObtenida.getPaciente().getDni().equals(DNIIngresado)) {
+                    LocalTime horaInicioAntigua = citaObtenida.getTurno()getHoraInicio();
+                    LocalTime horaFinalAntigua = citaObtenida.getTurno()getHoraFin();
+                    if(citaObtenida.getFecha().equals(fechaNueva)){
+                        if(horaInicioNueva.isBefore(horaFinalAntigua) &&
+                        horaFinNueva.isAfter(horaInicioAntigua)){
+                            System.out.println("Tenemos un problema de fechas...parece que las fechas chocan entre si, intenta con otras fechas");
+                            return;
+                        }
+                    }
+                }
+            }
+            System.out.println("No hay errores, se procede con la creacion!");
+    */
+
+
+
+    public static void cargarDatosPrueba() {
+
+        // 1. Seguro
+        Seguro seguro = new Seguro("SIS");
+
+        // 2. Paciente
+        Paciente paciente = new Paciente(
+                "12345678",
+                "Aaron",
+                "Ramirez",
+                "Lopez",
+                LocalDate.of(2003, 5, 15),
+                "M",
+                "Av. Principal 123",
+                "987654321",
+                "aaron@gmail.com",
+                seguro
+        );
+
+        // 3. Especialidad
+        Especialidad especialidad = new Especialidad("Medicina General");
+
+        // 4. Médico
+        Medico medico = new Medico(
+                "87654321",
+                "Carlos",
+                "Perez",
+                "Garcia",
+                LocalDate.of(1980, 3, 20),
+                "M",
+                "CMP12345"
+        );
+
+        // 5. Consultorio
+        Consultorio consultorio = new Consultorio(
+                "Consultorio 101",
+                "Lima",
+                "Av. Salud 456"
+        );
+
+        // 6. Horario
+        Horario horario = new Horario(
+                medico,
+                consultorio,
+                3,
+                LocalTime.of(8, 0),
+                LocalTime.of(12, 0)
+        );
+
+        // 7. Turno
+        Turno turno = new Turno(
+                horario,
+                LocalDate.of(2026, 11, 11),
+                LocalTime.of(9, 0),
+                LocalTime.of(9, 30),
+                "DISPONIBLE"
+        );
+
+        // 8. Cita
+        Cita cita = new Cita(
+                1,
+                paciente,
+                turno,
+                "PROGRAMADA"
+        );
+
+        // 9. Agregar a la lista
+        citas.add(cita);
+        turnos.add(turno);
+        seguros.add(seguro);
+        pacientes.add(paciente);
+        especialidades.add(especialidad);
+        medicos.add(medico);
+        consultorios.add(consultorio);
+        horarios.add(horario);
     }
 }

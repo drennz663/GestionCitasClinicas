@@ -10,7 +10,8 @@ public class Cita {
     private Turno turno;
     private String estado;
 
-    public Cita(Paciente paciente, Turno turno, String estado) {
+    public Cita(int cita,Paciente paciente, Turno turno, String estado) {
+        setIdCita(cita);
         setPaciente(paciente);
         setTurno(turno);
         setEstado(estado);
