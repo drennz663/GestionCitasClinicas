@@ -2,6 +2,8 @@ package app;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.Scanner;
 
 public class Turno {
 
@@ -94,4 +96,27 @@ public class Turno {
 
         this.estado = estado;
     }
+
+    public static void consultarPorEspecialidad(List<Turno> turnos, Scanner sc) {
+        System.out.print("Especialidad: ");
+        String nombre = sc.nextLine().trim();
+
+        boolean encontrado = false;
+        for (Turno t : turnos) {
+            Medico m = t.getHorario().getMedico();
+            if (t.getEstado().equals("DISPONIBLE") && m.tieneEspecialidad(nombre)) {
+                System.out.println(t.getFecha() + " " + t.getHoraInicio() + "-" + t.getHoraFin()
+                        + " | Medico: " + m.getNombreCompleto()
+                        + " | Consultorio: " + t.getHorario().getConsultorio().getNombre());
+                encontrado = true;
+            }
+        }
+
+        if (!encontrado) {
+            System.out.println("No hay horarios disponibles para esa especialidad");
+        }
+    }
+
+
+
 }

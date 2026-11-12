@@ -2,6 +2,8 @@ package app;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.Scanner;
 
 public class Cita {
 
@@ -84,4 +86,29 @@ public class Cita {
 
         this.estado = estado;
     }
+
+    public static void filtrarPorEstado(List<Cita> citas, Scanner sc) {
+        System.out.print("Estado (PROGRAMADA, CONFIRMADA, ATENDIDA, CANCELADA, NO ASISTIO): ");
+        String estado = sc.nextLine().trim();
+
+        boolean encontrada = false;
+        for (Cita c : citas) {
+            if (c.getEstado().equalsIgnoreCase(estado)) {
+                System.out.println("Cita " + c.getIdCita()
+                        + " | Paciente: " + c.getPaciente().getNombreCompleto()
+                        + " | Medico: " + c.getMedico().getNombreCompleto()
+                        + " | " + c.getFecha() + " " + c.getHora()
+                        + " | " + c.getEstado());
+                encontrada = true;
+            }
+        }
+
+        if (!encontrada) {
+            System.out.println("No hay citas con ese estado");
+        }
+    }
+
+
+
+
 }
