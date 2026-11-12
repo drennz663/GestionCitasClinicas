@@ -4,6 +4,7 @@ package app;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Medico extends Persona {
 
@@ -76,4 +77,49 @@ public class Medico extends Persona {
              + " | Especialidades: "
              + especialidades.size();
     }
+
+	public static void modificar(List<Medico> medicos, Scanner sc) {
+		System.out.print("DNI del medico: ");
+		String dni = sc.nextLine().trim();
+
+		for (Medico m : medicos) {
+			if (m.getDni().equals(dni)) {
+				m.modificarMedico(sc);
+				return;
+			}
+		}
+		System.out.println("Medico no encontrado");
+	}
+
+	public void modificarMedico(Scanner sc) {
+		try {
+			System.out.print("Nuevos nombres: ");
+			String nombres = sc.nextLine();
+			System.out.print("Nuevo apellido paterno: ");
+			String paterno = sc.nextLine();
+			System.out.print("Nuevo apellido materno: ");
+			String materno = sc.nextLine();
+			System.out.print("Nuevo CMP: ");
+			String cmp = sc.nextLine();
+
+			setNombres(nombres);
+			setApellidoPaterno(paterno);
+			setApellidoMaterno(materno);
+			setCmp(cmp);
+
+			System.out.println("Medico modificado");
+		} catch (IllegalArgumentException e) {
+			System.out.println("Error: " + e.getMessage());
+		}
+	}
+
+	public boolean tieneEspecialidad(String nombre) {
+		for (Especialidad e : especialidades) {
+			if (e.getDescripcion().equalsIgnoreCase(nombre)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

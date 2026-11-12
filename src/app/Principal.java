@@ -134,6 +134,7 @@ public class Principal {
             System.out.println("1. Registrar medico");
             System.out.println("2. Listar medicos");
             System.out.println("3. Asignar especialidad");
+            System.out.println("4. Modificar medico");
             System.out.println("0. Volver");
 
             opcion = leerEntero("Opcion: ");
@@ -147,6 +148,9 @@ public class Principal {
                     break;
                 case 3:
                     // asignarEspecialidad();
+                    break;
+                case 4:
+                    Medico.modificar(medicos, sc);
                     break;
                 case 0:
                     break;
@@ -250,6 +254,7 @@ public class Principal {
             System.out.println("1. Registrar horario");
             System.out.println("2. Listar horarios");
             System.out.println("3. Consultar horarios por medico");
+            System.out.println("4. Consultar horarios disponibles por especialidad");
             System.out.println("0. Volver");
 
             opcion = leerEntero("Opcion: ");
@@ -263,6 +268,9 @@ public class Principal {
                     break;
                 case 3:
                     // consultarHorariosMedico();
+                    break;
+                case 4:
+                    Turno.consultarPorEspecialidad(turnos, sc);
                     break;
                 case 0:
                     break;
@@ -319,6 +327,7 @@ public class Principal {
             System.out.println("2. Listar citas");
             System.out.println("3. Confirmar cita");
             System.out.println("4. Cancelar cita");
+            System.out.println("5. Filtrar citas por estado");
             System.out.println("0. Volver");
 
             opcion = leerEntero("Opcion: ");
@@ -335,6 +344,9 @@ public class Principal {
                     break;
                 case 4:
                     // cancelarCita();
+                    break;
+                case 5:
+                    Cita.filtrarPorEstado(citas, sc);
                     break;
                 case 0:
                     break;
