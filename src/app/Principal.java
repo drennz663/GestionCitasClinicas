@@ -67,6 +67,7 @@ public class Principal {
             System.out.println("\n=== GESTION DE PACIENTES ===");
             System.out.println("1. Registrar paciente");
             System.out.println("2. Listar pacientes");
+            System.out.println("3. Modificar datos de paciente");
             System.out.println("0. Volver");
             opcion = leerEntero("Opcion: ");
 
@@ -76,6 +77,54 @@ public class Principal {
                     break;
                 case 2:
                     //Paciente.listarPacientes(pacientes);
+                    break;
+                case 3:
+                    System.out.print("Ingrese el código del paciente (Ej: PAC001): ");
+                    String codigoBuscado = sc.nextLine().trim();
+
+                    // Tipo Variable Local: Búsqueda directa en la colección
+                    Paciente pacienteEncontrado = null;
+                    for (Paciente p : pacientes) {
+                        if (p.getCodigo().equalsIgnoreCase(codigoBuscado)) {
+                            pacienteEncontrado = p;
+                            break;
+                        }
+                    }
+
+                    if (pacienteEncontrado == null) {
+                        System.out.println("Error: Paciente no encontrado.");
+                        break;
+                    }
+
+                    // Selección independiente 1: Dirección
+                    String nuevaDireccion = null;
+                    System.out.print("¿Desea modificar la dirección? (SI/N): ");
+                    if (sc.nextLine().trim().equalsIgnoreCase("SI")) {
+                        System.out.print("Ingrese la nueva dirección: ");
+                        nuevaDireccion = sc.nextLine();
+                    }
+
+                    // Selección independiente 2: Seguro
+                    Seguro nuevoSeguro = null;
+                    System.out.print("¿Desea modificar el seguro? (SI/NO): ");
+                    if (sc.nextLine().trim().equalsIgnoreCase("SI") && !seguros.isEmpty()) {
+                        System.out.println("Seguros disponibles:");
+                        for (int i = 0; i < seguros.size(); i++) {
+                            System.out.println((i + 1) + ". " + seguros.get(i).getNombre());
+                        }
+                        System.out.print("Seleccione el número de seguro: ");
+                        int idxSeguro = Integer.parseInt(sc.nextLine()) - 1;
+                        if (idxSeguro >= 0 && idxSeguro < seguros.size()) {
+                            nuevoSeguro = seguros.get(idxSeguro);
+                        }
+                    }
+
+                    try {
+                        pacienteEncontrado.actualizarDatos(nuevaDireccion, nuevoSeguro);
+                        System.out.println("¡Datos del paciente actualizados exitosamente!");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Error de validación: " + e.getMessage());
+                    }
                     break;
                 case 0:
                     break;
