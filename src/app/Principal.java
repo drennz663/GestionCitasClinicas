@@ -109,7 +109,7 @@ public class Principal {
                     if (sc.nextLine().trim().equalsIgnoreCase("SI") && !seguros.isEmpty()) {
                         System.out.println("Seguros disponibles:");
                         for (int i = 0; i < seguros.size(); i++) {
-                            System.out.println((i + 1) + ". " + seguros.get(i).getNombre());
+                            System.out.println((i + 1) + ". " + seguros.get(i).getNombreSeguro());
                         }
                         System.out.print("Seleccione el número de seguro: ");
                         int idxSeguro = Integer.parseInt(sc.nextLine()) - 1;
@@ -255,6 +255,7 @@ public class Principal {
                     System.out.print("Ingrese el DNI o código del paciente: ");
                     String codPac = sc.nextLine().trim();
                     Paciente pacEncontrado = null;
+                    
                     for (Paciente p : pacientes) {
                         if (p.getCodigo().equalsIgnoreCase(codPac) || p.getDni().equals(codPac)) {
                             pacEncontrado = p;
@@ -283,10 +284,11 @@ public class Principal {
                     for (int i = 0; i < consultorios.size(); i++) {
                         System.out.println((i + 1) + ". " + consultorios.get(i).getNombre());
                     }
-                    int idxCons = leerEntero("Seleccione número de consultorio: ") - 1;
-                    if (idxCons < 0 || idxCons >= consultorios.size()) { System.out.println("Consultorio inválido."); break; }
-                    Consultorio consSeleccionado = consultorios.get(idxCons);
-
+                    int idCons = leerEntero("Seleccione número de consultorio: ") - 1;
+                    if (idCons < 0 || idCons >= consultorios.size()) { System.out.println("Consultorio inválido."); break; }
+                    Consultorio consSeleccionado = consultorios.get(idCons);
+                    
+                    //Fecha registrar fecha
                     System.out.print("Ingrese fecha de cita (AAAA-MM-DD): ");
                     LocalDate fecha = LocalDate.parse(sc.nextLine().trim());
 
