@@ -104,7 +104,7 @@ public class Turno {
         boolean encontrado = false;
         for (Turno t : turnos) {
             Medico m = t.getHorario().getMedico();
-            if (t.getEstado().equals("DISPONIBLE") && m.tieneEspecialidad(nombre)) {
+            if (t.getEstado().equals("DISPONIBLE") && m.isActivo() && m.tieneEspecialidad(nombre)) {
                 System.out.println(t.getFecha() + " " + t.getHoraInicio() + "-" + t.getHoraFin()
                         + " | Medico: " + m.getNombreCompleto()
                         + " | Consultorio: " + t.getHorario().getConsultorio().getNombre());

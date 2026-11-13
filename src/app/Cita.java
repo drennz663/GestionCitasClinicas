@@ -108,7 +108,26 @@ public class Cita {
         }
     }
 
+    public static void consultarPorPaciente(List<Cita> citas, Scanner sc) {
+        System.out.print("DNI del paciente: ");
+        String dni = sc.nextLine().trim();
 
+        boolean encontrada = false;
+        for (Cita c : citas) {
+            if (c.getPaciente().getDni().equals(dni)) {
+                System.out.println("Cita " + c.getIdCita()
+                        + " | " + c.getFecha() + " " + c.getHora()
+                        + " | Medico: " + c.getMedico().getNombreCompleto()
+                        + " | Consultorio: " + c.getConsultorio().getNombre()
+                        + " | Estado: " + c.getEstado());
+                encontrada = true;
+            }
+        }
+
+        if (!encontrada) {
+            System.out.println("No hay citas para ese paciente");
+        }
+    }
 
 
 }

@@ -1,6 +1,8 @@
 package app;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Scanner;
 
 public class Paciente extends Persona {
 
@@ -79,4 +81,5 @@ public class Paciente extends Persona {
              + " | DNI: " + getDni()
              + " | Seguro: " + seguro.getNombreSeguro();
     }
+
 }
