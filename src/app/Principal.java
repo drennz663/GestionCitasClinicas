@@ -246,6 +246,61 @@ public class Principal {
 
             switch (opcion) {
                 case 1:
+                    if (pacientes.isEmpty() || medicos.isEmpty() || consultorios.isEmpty()) {
+                        System.out.println("Error: Debe registrar pacientes, médicos y consultorios primero.");
+                        break;
+                    }
+
+                    System.out.println("\n--- PROGRAMAR CITA ---");
+                    System.out.print("Ingrese el DNI o código del paciente: ");
+                    String codPac = sc.nextLine().trim();
+                    Paciente pacEncontrado = null;
+                    for (Paciente p : pacientes) {
+                        if (p.getCodigo().equalsIgnoreCase(codPac) || p.getDni().equals(codPac)) {
+                            pacEncontrado = p;
+                            break;
+                        }
+                    }
+                    if (pacEncontrado == null) { 
+                        System.out.println("Paciente no encontrado.");
+                        break;
+                    }
+
+                    // Selección rápida de Médico (mostrando lista básica)
+                    System.out.println("Médicos disponibles:");
+                    for (int i = 0; i < medicos.size(); i++) {
+                        System.out.println((i + 1) + ". " + medicos.get(i).getNombres() " " + medicos.get().getApellidoPaterno());
+                    }
+                    int idMed = leerEntero("Seleccione número de médico: ") - 1;
+                    if (idMed < 0 || idMed >= medicos.size()){
+                        System.out.println("Médico inválido.");
+                        break;
+                    }
+                    Medico medSeleccionado = medicos.get(idMed);
+
+                    // Selección rápida de Consultorio
+                    System.out.println("Consultorios disponibles:");
+                    for (int i = 0; i < consultorios.size(); i++) {
+                        System.out.println((i + 1) + ". " + consultorios.get(i).getNombre());
+                    }
+                    int idxCons = leerEntero("Seleccione número de consultorio: ") - 1;
+                    if (idxCons < 0 || idxCons >= consultorios.size()) { System.out.println("Consultorio inválido."); break; }
+                    Consultorio consSeleccionado = consultorios.get(idxCons);
+
+                    System.out.print("Ingrese fecha de cita (AAAA-MM-DD): ");
+                    LocalDate fecha = LocalDate.parse(sc.nextLine().trim());
+
+                    System.out.print("Ingrese motivo de consulta: ");
+                    String motivo = sc.nextLine().trim();
+
+                    try {
+                        Atencion nuevaCita = new Atencion(fecha, pacEncontrado, medSeleccionado, consSeleccionado, null, motivo);
+                        atenciones.add(nuevaCita);
+                        System.out.println("¡Cita programada con éxito! Código: " + nuevaCita.getCodigo());
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Error: " + e.getMessage());
+                    }
+                    break;
                     //registrarAtencion();
                     break;
                 case 2:
