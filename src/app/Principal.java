@@ -267,7 +267,7 @@ public class Principal {
                         break;
                     }
 
-                    // Selección rápida de Médico (mostrando lista básica)
+                    // Selección rápida de Médico 
                     System.out.println("Médicos disponibles:");
                     for (int i = 0; i < medicos.size(); i++) {
                         System.out.println((i + 1) + ". " + medicos.get(i).getNombres() " " + medicos.get().getApellidoPaterno());
@@ -303,8 +303,7 @@ public class Principal {
                         System.out.println("Error: " + e.getMessage());
                     }
                     break;
-                    //registrarAtencion();
-                    break;
+                    
                 case 2:
                     //listarAtenciones();
                     break;
