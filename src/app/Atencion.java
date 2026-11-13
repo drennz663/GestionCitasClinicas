@@ -89,4 +89,8 @@ public class Atencion {
         }
         this.motivo = motivo;
     }
+
+    public void reprogramarCita(LocalDate nuevaFecha) {
+        setFechaAtencion(nuevaFecha);
+    }
 }
