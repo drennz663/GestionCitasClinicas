@@ -28,6 +28,8 @@ public class Atencion {
         return codigo;
     }
     public LocalDate getFechaAtencion() {
+        if (fechaAtencion == null || fechaAtencion.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("La fecha de la cita no puede ser en el pasado");
         return fechaAtencion;
     }
     public Paciente getPaciente() {
