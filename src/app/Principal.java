@@ -27,7 +27,7 @@ public class Principal {
             System.out.println("3. Gestion de Especialidades");
             System.out.println("4. Gestion de Seguros");
             System.out.println("5. Gestion de Consultorios");
-            System.out.println("6. Gestion de Atenciones");
+            System.out.println("6. Gestion de Atencionesss");
             System.out.println("0. Salir");
             opcion = leerEntero("Opcion: ");
 
