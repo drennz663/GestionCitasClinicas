@@ -116,4 +116,13 @@ public class Paciente {
         }
         this.seguro = seguro;
     }
+
+    public void actualizarDatos(String nuevaDireccion, Seguro nuevoSeguro) {
+        if (nuevaDireccion != null && !nuevaDireccion.isBlank()) {
+            setDireccion(nuevaDireccion);
+        }
+        if (nuevoSeguro != null) {
+            setSeguro(nuevoSeguro);
+        }
+    }
 }
