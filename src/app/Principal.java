@@ -67,6 +67,7 @@ public class Principal {
             System.out.println("1. Registrar paciente");
             System.out.println("2. Listar pacientes");
             System.out.println("3. Modificar datos de paciente");
+            System.out.println("4. Reprogramar cita de atencion");
             System.out.println("0. Volver");
             opcion = leerEntero("Opcion: ");
 
@@ -125,6 +126,38 @@ public class Principal {
                         System.out.println("Error de validación: " + e.getMessage());
                     }
                     break;
+                case 4:
+                    System.out.println("\n--- REPROGRAMAR CITA MÉDICA ---");
+                    System.out.print("Ingrese el código de la atención (Ej: ATE001): ");
+                    
+                    String codigoBuscado = sc.nextLine().trim();
+                    Atencion citaEncontrada = null;
+                    for (Atencion a : atenciones) {
+                        if (a.getCodigo().equalsIgnoreCase(codigoBuscado)) {
+                            citaEncontrada = a;
+                            break;
+                        }
+                    }
+
+                    if (citaEncontrada == null) {
+                        System.out.println("Error: Cita médica no encontrada con ese código.");
+                        break;
+                    }
+
+                    System.out.println("Cita actual encontrada para el paciente: " + citaEncontrada.getPaciente().getNombres());
+                    System.out.println("Fecha actual: " + citaEncontrada.getFechaAtencion());
+
+                    System.out.print("Ingrese la nueva fecha de la cita : ");
+                    LocalDate nuevaFecha = null;
+                    try {
+                        nuevaFecha = LocalDate.parse(sc.nextLine());
+                    
+                        citaEncontrada.reprogramarCita(nuevaFecha);
+                        System.out.println("¡Cita reprogramada exitosamente para : " + citaEncontrada.getFechaAtencion() + "!");
+                    } catch (Exception e) {
+                        System.out.println("Error en la reprogramación: " + e.getMessage());
+                    }
+                    
                 case 0:
                     break;
                 default:
