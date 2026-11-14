@@ -28,8 +28,6 @@ public class Principal {
 
     public static void main(String[] args) {
         int opcion;
-        cargarDatosPrueba();
-
         do {
             System.out.println("\n========== SISTEMA CLINICO ==========");
             System.out.println("\n1.  Gestion de Pacientes");
@@ -651,82 +649,4 @@ public class Principal {
             System.out.println("No hay errores, se procede con la creacion!");
     */
 
-
-
-    public static void cargarDatosPrueba() {
-
-        // 1. Seguro
-        Seguro seguro = new Seguro("SIS");
-
-        // 2. Paciente
-        Paciente paciente = new Paciente(
-                "12345678",
-                "Aaron",
-                "Ramirez",
-                "Lopez",
-                LocalDate.of(2003, 5, 15),
-                "M",
-                "Av. Principal 123",
-                "987654321",
-                "aaron@gmail.com",
-                seguro
-        );
-
-        // 3. Especialidad
-        Especialidad especialidad = new Especialidad("Medicina General");
-
-        // 4. Médico
-        Medico medico = new Medico(
-                "87654321",
-                "Carlos",
-                "Perez",
-                "Garcia",
-                LocalDate.of(1980, 3, 20),
-                "M",
-                "CMP12345"
-        );
-
-        // 5. Consultorio
-        Consultorio consultorio = new Consultorio(
-                "Consultorio 101",
-                "Lima",
-                "Av. Salud 456"
-        );
-
-        // 6. Horario
-        Horario horario = new Horario(
-                medico,
-                consultorio,
-                3,
-                LocalTime.of(8, 0),
-                LocalTime.of(12, 0)
-        );
-
-        // 7. Turno
-        Turno turno = new Turno(
-                horario,
-                LocalDate.of(2026, 11, 11),
-                LocalTime.of(9, 0),
-                LocalTime.of(9, 30),
-                "DISPONIBLE"
-        );
-
-        // 8. Cita
-        Cita cita = new Cita(
-                1,
-                paciente,
-                turno,
-                "PROGRAMADA"
-        );
-
-        // 9. Agregar a la lista
-        citas.add(cita);
-        turnos.add(turno);
-        seguros.add(seguro);
-        pacientes.add(paciente);
-        especialidades.add(especialidad);
-        medicos.add(medico);
-        consultorios.add(consultorio);
-        horarios.add(horario);
-    }
 }
