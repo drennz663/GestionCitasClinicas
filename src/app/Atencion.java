@@ -28,6 +28,9 @@ public class Atencion {
         return codigo;
     }
     public LocalDate getFechaAtencion() {
+        if (fechaAtencion == null || fechaAtencion.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("La fecha de reprogramación no puede ser en el pasado.");
+        }
         return fechaAtencion;
     }
     public Paciente getPaciente() {
@@ -86,5 +89,9 @@ public class Atencion {
             throw new IllegalArgumentException("Motivo vacío");
         }
         this.motivo = motivo;
+    }
+
+    public void reprogramarCita(LocalDate nuevaFecha) {
+        setFechaAtencion(nuevaFecha);
     }
 }
