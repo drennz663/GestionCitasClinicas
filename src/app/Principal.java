@@ -1,6 +1,7 @@
 
 package app;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -309,7 +310,7 @@ public class Principal {
                         System.out.println("Error de validación: " + e.getMessage());
                     }
                     break;
-                    break;
+                    
                 case 2:
                     //listarAtenciones();
                     break;

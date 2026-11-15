@@ -123,4 +123,7 @@ public class Paciente {
         }
         if (nuevoSeguro != null) {
             setSeguro(nuevoSeguro);
+        }
+    }   
 }
+
