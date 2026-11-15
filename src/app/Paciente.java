@@ -73,6 +73,16 @@ public class Paciente extends Persona {
         this.seguro = seguro;
     }
 
+    public void actualizarDatos(String nuevaDireccion, Seguro nuevoSeguro) {
+        if (nuevaDireccion != null && !nuevaDireccion.isBlank()) {
+            setDireccion(nuevaDireccion);
+        }
+
+        if (nuevoSeguro != null) {
+            setSeguro(nuevoSeguro);
+        }
+    }
+
     @Override
     public String mostrarInformacion() {
         return "PACIENTE: " + getNombreCompleto()

@@ -1,6 +1,8 @@
 
 package app;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -105,6 +107,7 @@ public class Principal {
             System.out.println("\n=== GESTION DE PACIENTES ===");
             System.out.println("1. Registrar paciente");
             System.out.println("2. Listar pacientes");
+            System.out.println("3. Modificar datos del paciente");
             System.out.println("0. Volver");
 
             opcion = leerEntero("Opcion: ");
@@ -116,6 +119,56 @@ public class Principal {
                 case 2:
                     // listarPacientes();
                     break;
+                case 3:
+                     System.out.print("Ingrese el código del paciente (Ej: PAC001): ");
+                     String codigoBuscado = sc.nextLine().trim();
+                    
+                    Paciente pacienteEncontrado = null;
+                    for (Paciente p : pacientes) { 
+                        if (p.getIdPaciente()== Integer.parseInt(codigoBuscado)) {
+                            pacienteEncontrado = p;
+                            break;
+                        }
+                    }
+
+                    if (pacienteEncontrado == null) {
+                        System.out.println("Error: Paciente no encontrado.");
+                        break;
+                    }
+
+                    // Selección independiente 1: Dirección
+                    String nuevaDireccion = null;
+                    System.out.print("¿Desea modificar la dirección? (SI/N): ");
+                    if (sc.nextLine().trim().equalsIgnoreCase("SI")) {
+                        System.out.print("Ingrese la nueva dirección: ");
+                        nuevaDireccion = sc.nextLine();
+                    }
+
+                    // Selección independiente 2: Seguro 
+                    Seguro nuevoSeguro = null;
+                    System.out.print("¿Desea modificar el seguro? (SI/NO): ");
+                    if (sc.nextLine().trim().equalsIgnoreCase("SI") && !seguros.isEmpty()) {
+                        System.out.println("Seguros disponibles:");
+                        for (int i = 0; i < seguros.size(); i++) { 
+                            
+                            System.out.println((i + 1) + ". " + seguros.get(i).getNombreSeguro());
+                        }
+                        System.out.print("Seleccione el número de seguro: ");
+                        int idSeguro = Integer.parseInt(sc.nextLine()) - 1;
+                        if (idSeguro >= 0 && idSeguro < seguros.size()) {
+                            nuevoSeguro = seguros.get(idSeguro);
+                        }
+                    }
+
+                    try {
+                        
+                        pacienteEncontrado.actualizarDatos(nuevaDireccion, nuevoSeguro);
+                        System.out.println("¡Datos del paciente actualizados exitosamente!");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Error de validación: " + e.getMessage());
+                    }
+                    break;
+                    // modificarPaciente();
                 case 0:
                     break;
                 default:
@@ -367,14 +420,16 @@ public class Principal {
             System.out.println("2. Listar atenciones");
             System.out.println("3. Ver detalle de atencion");
             System.out.println("4. Asignar diagnostico");
+            System.out.println("5. Reprogramar citas");
             System.out.println("0. Volver");
 
             opcion = leerEntero("Opcion: ");
 
             switch (opcion) {
                 case 1:
-                    // registrarAtencion();
+                    registrarAtencionCompleta();
                     break;
+            
                 case 2:
                     // listarAtenciones();
                     break;
@@ -384,6 +439,9 @@ public class Principal {
                 case 4:
                     // asignarDiagnostico();
                     break;
+                case 5:
+                    // reprogramarCita();
+                    break;  
                 case 0:
                     break;
                 default:
@@ -529,5 +587,145 @@ public class Principal {
                 System.out.println("Ingrese un numero valido");
             }
         }
+    }
+
+    public static void registrarAtencionCompleta() {
+   
+    System.out.print("Ingrese DNI o Código del paciente: ");
+    String codPac = sc.nextLine().trim();
+    Paciente pacienteEncontrado = null;
+    
+    for (int i = 0; i < pacientes.size(); i++) {
+        Paciente p = pacientes.get(i);
+        if (String.valueOf(p.getIdPaciente()).equalsIgnoreCase(codPac) || p.getDni().equals(codPac)) {
+            pacienteEncontrado = p;
+            break;
+        }
+    }
+    
+    if (pacienteEncontrado == null) {
+        System.out.println("Error: Paciente no encontrado.");
+        return;
+    }
+
+    // 2. Validar y seleccionar el médico
+    if (medicos.isEmpty()) {
+        System.out.println("Error: No hay médicos registrados.");
+        return;
+    }
+    
+    System.out.println("Médicos disponibles:");
+    for (int i = 0; i < medicos.size(); i++) {
+        Medico m = medicos.get(i);
+        System.out.println((i + 1) + ". Dr(a). " + m.getNombres() + " " + m.getApellidoPaterno());
+    }
+    
+    int idMed = Integer.parseInt(sc.nextLine().trim()) - 1;
+    if (idMed < 0 || idMed >= medicos.size()) {
+        System.out.println("Error: Médico inválido.");
+        return;
+    }
+
+    
+    if (horarios.isEmpty()) {
+        System.out.println("Error: No hay horarios.");
+        return;
+    }
+
+    System.out.print("Ingrese fecha de cita: ");
+    LocalDate fechaCita = LocalDate.parse(sc.nextLine());
+    
+    System.out.print("Ingrese hora de cita (HH:MM): ");
+    LocalTime horaCita = LocalTime.parse(sc.nextLine());
+
+   
+    try {
+        // Creamos el Turno usando el primer horario y los parámetros correctos
+        Turno turnoAsignado = new Turno(horarios.get(0), fechaCita, horaCita, horaCita.plusMinutes(30), "DISPONIBLE");
+        
+
+        Cita nuevaCita = new Cita(pacienteEncontrado, turnoAsignado, "PROGRAMADA");
+        citas.add(nuevaCita);
+
+    
+        System.out.print("Ingrese motivo: ");
+        String motivo = sc.nextLine().trim();
+
+        Atencion nuevaAtencion = new Atencion(nuevaCita, fechaCita, motivo);
+        atenciones.add(nuevaAtencion);
+
+        System.out.println("¡Cita y atención programadas: " + nuevaAtencion.getIdAtencion());
+        
+        } catch (IllegalArgumentException e) {
+       
+            System.out.println("Error de validación: " + e.getMessage());
+            }
+
+    }
+
+
+    public static void reprogramarCita() {
+      if (citas.isEmpty()) {
+          System.out.println("Error: No hay citas registradas.");
+          return;
+        }
+
+      // 1. Pedir el DNI del paciente para buscar sus citas
+      System.out.print("Ingrese el DNI del paciente para buscar su cita: ");
+      String dniBuscado = sc.nextLine().trim();
+
+      // 2. Buscar las citas que correspondan a ese DNI usando un bucle tradicional
+      ArrayList<Cita> citasDelPaciente = new ArrayList<>();
+      for (int i = 0; i < citas.size(); i++) {
+        Cita c = citas.get(i);
+        if (c.getPaciente().getDni().equalsIgnoreCase(dniBuscado)) {
+            citasDelPaciente.add(c);
+            }
+        }
+
+       if (citasDelPaciente.isEmpty()) {
+          System.out.println("Error: No se encontraron citas para el DNI.");
+          return;
+        }
+
+         // 3. Mostrar las citas encontradas de ese paciente
+        System.out.println("Citas encontradas para el paciente:");
+        for (int i = 0; i < citasDelPaciente.size(); i++) {
+            Cita c = citasDelPaciente.get(i);
+            System.out.println((i + 1) + ". Médico: " + c.getMedico().getNombres() + 
+                           " | Fecha actual: " + c.getFecha() + " " + c.getHora() + 
+                           " | Estado: " + c.getEstado());
+            }
+
+            // 4. Seleccionar cuál de las citas del paciente se va a reprogramar
+        System.out.print("Seleccione el número de la cita a reprogramar: ");
+        int indexCita = Integer.parseInt(sc.nextLine().trim()) - 1;
+
+        if (indexCita < 0 || indexCita >= citasDelPaciente.size()) {
+        System.out.println("Error: Selección inválida.");
+        return;
+
+            }
+
+        Cita citaSeleccionada = citasDelPaciente.get(indexCita);
+
+            // 5. Pedir la nueva fecha y hora
+         System.out.print("Ingrese la nueva fecha: ");
+            LocalDate nuevaFecha = LocalDate.parse(sc.nextLine().trim());
+
+        System.out.print("Ingrese la nueva hora: ");
+        LocalTime nuevaHora = LocalTime.parse(sc.nextLine().trim());
+
+         // 6. Actualizar el turno de la cita de forma segura
+        try {
+        Turno nuevoTurno = new Turno(horarios.get(0), nuevaFecha, nuevaHora, nuevaHora.plusMinutes(30), "REPROGRAMADO");
+        citaSeleccionada.setTurno(nuevoTurno);
+
+        System.out.println("¡Cita reprogramada con éxito el DNI " + dniBuscado + 
+                           " | Nueva fecha: " + nuevaFecha + " a las " + nuevaHora + "!");
+        
+            } catch (Exception e) {
+        System.out.println("Error al reprogramar: " + e.getMessage());
+         }
     }
 }
