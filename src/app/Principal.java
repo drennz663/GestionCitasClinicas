@@ -8,7 +8,7 @@ public class Principal {
 
     static Scanner sc = new Scanner(System.in);
 
-    // LISTAS
+    // LISTAS ARRAYSS
     static ArrayList<Paciente> 			pacientes 		= new ArrayList<>();
     static ArrayList<Seguro> 			seguros 		= new ArrayList<>();
     static ArrayList<Medico> 			medicos 		= new ArrayList<>();
@@ -27,7 +27,7 @@ public class Principal {
         int opcion;
 
         do {
-            System.out.println("\n========== SISTEMA CLINICO ==========");
+            System.out.println("\n========== SISTEMA CLINICOOO ==========");
             System.out.println("\n1.  Gestion de Pacientes");
             System.out.println("2.  Gestion de Medicos");
             System.out.println("3.  Gestion de Especialidades");
