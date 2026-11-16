@@ -108,7 +108,18 @@ public class Cita {
         }
     }
 
-
-
+    // VALIDAR SI EL MEDICO YA TIENE UNA CITA
+    public static boolean tieneCita(List<Cita> citas, Turno turno) {
+        for (Cita c : citas) {
+            if (!c.getEstado().equals("CANCELADA") && !c.getEstado().equals("NO ASISTIO") &&
+                c.getMedico().getDni().equals(turno.getHorario().getMedico().getDni()) 
+                && c.getFecha().equals(turno.getFecha()) 
+                && turno.getHoraInicio().isBefore(c.getTurno().getHoraFin()) 
+                && turno.getHoraFin().isAfter(c.getHora())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

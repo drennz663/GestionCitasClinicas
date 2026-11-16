@@ -106,8 +106,8 @@ public class Principal {
         do {
             System.out.println("\n=== GESTION DE PACIENTES ===");
             System.out.println("1. Registrar paciente");
-            System.out.println("2. Listar pacientes");
-            System.out.println("3. Modificar datos del paciente");
+            System.out.println("2. Buscar Paciente");
+            System.out.println("3. Listar pacientes");
             System.out.println("0. Volver");
 
             opcion = leerEntero("Opcion: ");
@@ -117,9 +117,12 @@ public class Principal {
                     // registrarPaciente();
                     break;
                 case 2:
-                    // listarPacientes();
+                    Paciente.buscarPacientePorDNI(pacientes, sc);
                     break;
                 case 3:
+                    // listarPacientes();
+                    break;
+                case 4:
                      System.out.print("Ingrese el código del paciente (Ej: PAC001): ");
                      String codigoBuscado = sc.nextLine().trim();
                     
@@ -308,6 +311,7 @@ public class Principal {
             System.out.println("2. Listar horarios");
             System.out.println("3. Consultar horarios por medico");
             System.out.println("4. Consultar horarios disponibles por especialidad");
+            System.out.println("5. Modificar horario de medico");
             System.out.println("0. Volver");
 
             opcion = leerEntero("Opcion: ");
@@ -324,6 +328,9 @@ public class Principal {
                     break;
                 case 4:
                     Turno.consultarPorEspecialidad(turnos, sc);
+                    break;
+                case 5:
+                    Horario.modificarHorario(medicos, horarios, turnos, sc);;
                     break;
                 case 0:
                     break;
