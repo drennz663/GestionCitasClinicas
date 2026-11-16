@@ -26,7 +26,7 @@ public abstract class Persona {
     }
 
     public void setDni(String dni) {
-        if (dni == null || !dni.matches("\\d{8}")) {
+        if (!validarDNI(dni)) {
             throw new IllegalArgumentException("El DNI debe tener 8 digitos");
         }
         this.dni = dni;
@@ -98,5 +98,14 @@ public abstract class Persona {
         return nombres + " " + apellidoPaterno + " " + apellidoMaterno;
     }
 
-    public abstract String mostrarInformacion();
+    public void mostrarInformacion() {
+        System.out.println("DNI: " + getDni());
+        System.out.println("Nombre Completo: " + getNombreCompleto());
+        System.out.println("Fecha de Nacimiento: " + getFechaNacimiento());
+        System.out.println("Sexo: " + getSexo());
+    }
+    
+    public static boolean validarDNI(String dni) {
+        return dni != null && dni.matches("\\d{8}");
+    }
 }

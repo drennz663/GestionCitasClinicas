@@ -1,6 +1,8 @@
 package app;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Scanner;
 
 public class Paciente extends Persona {
 
@@ -74,9 +76,43 @@ public class Paciente extends Persona {
     }
 
     @Override
-    public String mostrarInformacion() {
-        return "PACIENTE: " + getNombreCompleto()
-             + " | DNI: " + getDni()
-             + " | Seguro: " + seguro.getNombreSeguro();
+    public void mostrarInformacion() {
+        System.out.println("\n======= DATOS DEL PACIENTE =======");
+        super.mostrarInformacion();
+        System.out.println("Direccion: " + getDireccion());
+        System.out.println("Telefono: " + getTelefono());
+        System.out.println("Correo: " + getCorreo());
+        System.out.println("Seguro: " + getSeguro().getNombreSeguro());
+        System.out.println("==================================");
+    }
+    
+    public static Paciente obtenerPacientePorDNI(List<Paciente> pacientes, String dni) {
+        for (Paciente p : pacientes) {
+            if (p.getDni().equals(dni))
+                return p;
+        }
+        return null;
+    }
+    
+    public static void buscarPacientePorDNI(List<Paciente> pacientes, Scanner sc) {
+        while (true) {
+            System.out.print("\nIngrese DNI (0 para volver): ");
+            String dni = sc.nextLine().trim();
+
+            if (dni.equals("0"))
+                return;
+
+            if (!Persona.validarDNI(dni)) {
+                System.out.println("El DNI debe tener 8 digitos");
+                continue;
+            }
+
+            Paciente paciente = obtenerPacientePorDNI(pacientes, dni);
+
+            if (paciente != null)
+                paciente.mostrarInformacion();
+            else
+                System.out.println("Paciente no encontrado");
+        }
     }
 }

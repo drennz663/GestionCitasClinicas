@@ -70,12 +70,19 @@ public class Medico extends Persona {
 	}
 
     @Override
-    public String mostrarInformacion() {
-        return "MEDICO: " + getNombreCompleto()
-             + " | DNI: " + getDni()
-             + " | CMP: " + cmp
-             + " | Especialidades: "
-             + especialidades.size();
+    public void mostrarInformacion() {
+        System.out.println("\n===== DATOS DEL MEDICO =====");
+        super.mostrarInformacion();
+        System.out.println("CMP: " + getCmp());
+        System.out.println("Especialidades:");
+        if (especialidades.isEmpty()) {
+            System.out.println("No tiene especialidades asignadas");
+        } else {
+            for (Especialidad e : especialidades) {
+                System.out.println("- " + e.getDescripcion());
+            }
+        }
+        System.out.println("============================");
     }
 
 	public static void modificar(List<Medico> medicos, Scanner sc) {
@@ -121,5 +128,12 @@ public class Medico extends Persona {
 		}
 		return false;
 	}
-
+	
+	public static Medico obtenerMedicoPorDNI(List<Medico> medicos, String dni) {
+	    for (Medico m : medicos) {
+	        if (m.getDni().equals(dni))
+	            return m;
+	    }
+	    return null;
+	}
 }
