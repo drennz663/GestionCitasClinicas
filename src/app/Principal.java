@@ -111,11 +111,12 @@ public class Principal {
             System.out.println("0. Volver");
 
             opcion = leerEntero("Opcion: ");
-
+           
             switch (opcion) {
-                case 1:
-                    // registrarPaciente();
-                    break;
+            case 1:
+                registrarPaciente();
+                break;
+         
                 case 2:
                     Paciente.buscarPacientePorDNI(pacientes, sc);
                     break;
@@ -196,8 +197,9 @@ public class Principal {
             opcion = leerEntero("Opcion: ");
 
             switch (opcion) {
+            
                 case 1:
-                    // registrarMedico();
+                    registrarMedico();
                     break;
                 case 2:
                     // listarMedicos();
@@ -403,7 +405,7 @@ public class Principal {
                     // confirmarCita();
                     break;
                 case 4:
-                    // cancelarCita();
+                    cancelarCita();
                     break;
                 case 5:
                     Cita.filtrarPorEstado(citas, sc);
@@ -735,4 +737,180 @@ public class Principal {
         System.out.println("Error al reprogramar: " + e.getMessage());
          }
     }
-}
+    public static void registrarPaciente() {
+        System.out.println("\n=== REGISTRAR PACIENTE ===");
+        System.out.print("DNI (8 dígitos): ");
+        String dni = sc.nextLine().trim();
+
+        if (!Persona.validarDNI(dni)) {
+            System.out.println("Error: El DNI debe tener exactamente 8 dígitos.");
+            return;
+        }
+
+        // Validación: Impedir registrar dos pacientes con el mismo DNI
+        if (Paciente.obtenerPacientePorDNI(pacientes, dni) != null) {
+            System.out.println("Error: Ya existe un paciente registrado con el DNI " + dni);
+            return;
+        }
+
+        try {
+            System.out.print("Nombres: ");
+            String nombres = sc.nextLine().trim();
+            System.out.print("Apellido Paterno: ");
+            String apPaterno = sc.nextLine().trim();
+            System.out.print("Apellido Materno: ");
+            String apMaterno = sc.nextLine().trim();
+            System.out.print("Fecha de Nacimiento (YYYY-MM-DD): ");
+            LocalDate fechaNac = LocalDate.parse(sc.nextLine().trim());
+            System.out.print("Sexo (M/F): ");
+            String sexo = sc.nextLine().trim();
+            System.out.print("Dirección: ");
+            String direccion = sc.nextLine().trim();
+            System.out.print("Teléfono: ");
+            String telefono = sc.nextLine().trim();
+            System.out.print("Correo: ");
+            String correo = sc.nextLine().trim();
+
+           if (seguros.isEmpty()) {
+               System.out.println("Error: Debe registrar al menos un seguro antes de registrar pacientes.");
+               return;
+            }
+
+            System.out.println("Seguros disponibles:");
+            for (int i = 0; i < seguros.size(); i++) {
+             System.out.println((i + 1) + ". " + seguros.get(i).getNombreSeguro());
+            }
+            
+           int idxSeguro = leerEntero("Seleccione el número de seguro: ") - 1;
+         if (idxSeguro < 0 || idxSeguro >= seguros.size()) {
+                System.out.println("Error: Selección de seguro inválida.");
+                return;
+            }
+            Seguro seguro = seguros.get(idxSeguro);
+          
+      
+            Paciente nuevoPaciente = new Paciente(dni, nombres, apPaterno, apMaterno, fechaNac, sexo, direccion, telefono, correo, seguro);
+            nuevoPaciente.setIdPaciente(pacientes.size() + 1);
+            pacientes.add(nuevoPaciente);
+
+            System.out.println("¡Paciente registrado exitosamente con ID: " + nuevoPaciente.getIdPaciente() + "!");
+        } catch (Exception e) {
+            System.out.println("Error de validación al registrar paciente: " + e.getMessage());
+        }
+    }
+ // REGISTRAR MEDICO (Evitando DNI y CMP duplicados)
+    public static void registrarMedico() {
+        System.out.println("\n=== REGISTRAR MEDICO ===");
+        System.out.print("DNI (8 dígitos): ");
+        String dni = sc.nextLine().trim();
+
+        if (!Persona.validarDNI(dni)) {
+            System.out.println("Error: El DNI debe tener exactamente 8 dígitos.");
+            return;
+        }
+
+        // Validación: DNI único en médicos
+        if (Medico.obtenerMedicoPorDNI(medicos, dni) != null) {
+            System.out.println("Error: Ya existe un médico registrado con el DNI " + dni);
+            return;
+        }
+
+        try {
+            System.out.print("Nombres: ");
+            String nombres = sc.nextLine().trim();
+            System.out.print("Apellido Paterno: ");
+            String apPaterno = sc.nextLine().trim();
+            System.out.print("Apellido Materno: ");
+            String apMaterno = sc.nextLine().trim();
+            System.out.print("Fecha de Nacimiento (YYYY-MM-DD): ");
+            LocalDate fechaNac = LocalDate.parse(sc.nextLine().trim());
+            System.out.print("Sexo (M/F): ");
+            String sexo = sc.nextLine().trim();
+            System.out.print("CMP (Colegio Médico del Perú): ");
+            String cmp = sc.nextLine().trim();
+
+           
+            for (Medico m : medicos) {
+                if (m.getCmp().equalsIgnoreCase(cmp)) {
+                    System.out.println("Error: Ya existe un médico registrado con el CMP " + cmp);
+                    return;
+                }
+            }
+
+            Medico nuevoMedico = new Medico(dni, nombres, apPaterno, apMaterno, fechaNac, sexo, cmp);
+            nuevoMedico.setIdMedico(medicos.size() + 1);
+            medicos.add(nuevoMedico);
+
+            System.out.println("¡Médico registrado exitosamente con ID: " + nuevoMedico.getIdMedico() + "!");
+        } catch (Exception e) {
+            System.out.println("Error de validación al registrar médico: " + e.getMessage());
+        }
+    }
+ // CANCELAR CITA CON MOTIVO OBLIGATORIO
+    public static void cancelarCita() {
+        if (citas.isEmpty()) {
+            System.out.println("Error: No hay citas registradas en el sistema.");
+            return;
+        }
+
+        System.out.print("Ingrese el DNI del paciente para buscar sus citas: ");
+        String dniBuscado = sc.nextLine().trim();
+
+        ArrayList<Cita> citasDelPaciente = new ArrayList<>();
+        for (Cita c : citas) {
+            // Solo listar citas activas que se puedan cancelar
+            if (c.getPaciente().getDni().equalsIgnoreCase(dniBuscado) && 
+                (c.getEstado().equals("PROGRAMADA") || c.getEstado().equals("CONFIRMADA"))) {
+                citasDelPaciente.add(c);
+            }
+        }
+
+        if (citasDelPaciente.isEmpty()) {
+            System.out.println("Error: No se encontraron citas activas para ese DNI.");
+            return;
+        }
+
+        System.out.println("\n--- CITAS ACTIVAS DEL PACIENTE ---");
+        for (int i = 0; i < citasDelPaciente.size(); i++) {
+            Cita c = citasDelPaciente.get(i);
+            System.out.println((i + 1) + ". Cita ID: " + c.getIdCita() + 
+                               " | Médico: " + c.getMedico().getNombreCompleto() + 
+                               " | Fecha: " + c.getFecha() + " " + c.getHora() + 
+                               " | Estado: " + c.getEstado());
+        }
+
+        System.out.print("Seleccione el número de la cita a cancelar (0 para volver): ");
+        int seleccion = leerEntero("");
+        if (seleccion == 0) return;
+
+        if (seleccion < 1 || seleccion > citasDelPaciente.size()) {
+            System.out.println("Error: Selección inválida.");
+            return;
+        }
+
+        Cita citaSeleccionada = citasDelPaciente.get(seleccion - 1);
+
+        // Registrar obligatoriamente el motivo de la cancelación
+        System.out.print("Ingrese el motivo de la cancelación (Obligatorio): ");
+        String motivo = sc.nextLine().trim();
+        if (motivo.isBlank()) {
+            System.out.println("Error: El motivo de la cancelación no puede estar vacío.");
+            return;
+        }
+        try {
+            citaSeleccionada.setEstado("CANCELADA");
+            
+            // Liberar el turno asociado si existe
+            if (citaSeleccionada.getTurno() != null) {
+                citaSeleccionada.getTurno().setEstado("DISPONIBLE");
+            }
+
+            System.out.println("¡Cita cancelada exitosamente!");
+            System.out.println("Motivo registrado: \"" + motivo + "\"");
+        } catch (Exception e) {
+            System.out.println("Error al procesar la cancelación: " + e.getMessage());
+        }
+    }
+    }
+    
+
