@@ -125,4 +125,5 @@ public class Paciente extends Persona {
                 System.out.println("Paciente no encontrado");
         }
     }
+
 }

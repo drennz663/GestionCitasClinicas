@@ -6,6 +6,11 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
+
 public class Principal {
 
     static Scanner sc = new Scanner(System.in);
@@ -25,7 +30,9 @@ public class Principal {
     static ArrayList<Medicamento>		medicamentos 	= new ArrayList<>();
     static ArrayList<Receta> 			recetas 		= new ArrayList<>();
 
+
     public static void main(String[] args) {
+        cargarDatosPrueba();
         int opcion;
 
         do {
@@ -98,6 +105,50 @@ public class Principal {
 
         sc.close();
     }
+    static void cargarDatosPrueba() {
+        Especialidad esp = new Especialidad("Cardiologia");
+        especialidades.add(esp);
+
+        Medico m = new Medico("12345678", "Carlos", "Mendoza", "Ruiz",
+                LocalDate.of(1980, 5, 10), "M", "CMP-001");
+        m.setIdMedico(1);
+        m.agregarEspecialidad(esp);
+        medicos.add(m);
+
+        Consultorio c = new Consultorio("Consultorio 101", "San Isidro", "Av. Arequipa 1250");
+        c.setIdConsultorio(1);
+        consultorios.add(c);
+
+        // Horario de los lunes (dia 1), 08:00 a 12:00
+        Horario h = new Horario(m, c, 1, LocalTime.of(8, 0), LocalTime.of(12, 0));
+        horarios.add(h);
+
+        LocalDate lunesPasado = LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
+        LocalDate lunesFuturo = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+
+        // Turno pasado (cita historica)
+        Turno tPasado = new Turno(h, lunesPasado, LocalTime.of(8, 0), LocalTime.of(8, 30), "RESERVADO");
+        // Turno futuro libre (se debe bloquear)
+        Turno tLibre = new Turno(h, lunesFuturo, LocalTime.of(8, 0), LocalTime.of(8, 30), "DISPONIBLE");
+        // Turno futuro reservado (NO se debe tocar)
+        Turno tReservado = new Turno(h, lunesFuturo, LocalTime.of(8, 30), LocalTime.of(9, 0), "RESERVADO");
+        turnos.add(tPasado);
+        turnos.add(tLibre);
+        turnos.add(tReservado);
+
+        Seguro seguro = new Seguro("Rimac");
+        seguro.setIdSeguro(1);
+        seguros.add(seguro);
+
+        Paciente p = new Paciente("87654321", "Ana", "Torres", "Lopez",
+                LocalDate.of(1995, 3, 15), "F",
+                "Av. Javier Prado 1540", "987654321", "ana.torres@gmail.com", seguro);
+        pacientes.add(p);
+
+        citas.add(new Cita(p, tPasado, "ATENDIDA"));
+        citas.add(new Cita(p, tReservado, "PROGRAMADA"));
+    }
+
 
     // GESTION DE PACIENTES
     public static void gestionPacientes() {
@@ -108,6 +159,7 @@ public class Principal {
             System.out.println("1. Registrar paciente");
             System.out.println("2. Buscar Paciente");
             System.out.println("3. Listar pacientes");
+            System.out.println("4. Modificar paciente");
             System.out.println("0. Volver");
 
             opcion = leerEntero("Opcion: ");
@@ -124,12 +176,12 @@ public class Principal {
                     // listarPacientes();
                     break;
                 case 4:
-                     System.out.print("Ingrese el código del paciente (Ej: PAC001): ");
-                     String codigoBuscado = sc.nextLine().trim();
-                    
+                    System.out.print("Ingrese el código del paciente (Ej: PAC001): ");
+                    String codigoBuscado = sc.nextLine().trim();
+
                     Paciente pacienteEncontrado = null;
-                    for (Paciente p : pacientes) { 
-                        if (p.getIdPaciente()== Integer.parseInt(codigoBuscado)) {
+                    for (Paciente p : pacientes) {
+                        if (p.getIdPaciente() == Integer.parseInt(codigoBuscado)) {
                             pacienteEncontrado = p;
                             break;
                         }
@@ -148,13 +200,12 @@ public class Principal {
                         nuevaDireccion = sc.nextLine();
                     }
 
-                    // Selección independiente 2: Seguro 
+                    // Selección independiente 2: Seguro
                     Seguro nuevoSeguro = null;
                     System.out.print("¿Desea modificar el seguro? (SI/NO): ");
                     if (sc.nextLine().trim().equalsIgnoreCase("SI") && !seguros.isEmpty()) {
                         System.out.println("Seguros disponibles:");
-                        for (int i = 0; i < seguros.size(); i++) { 
-                            
+                        for (int i = 0; i < seguros.size(); i++) {
                             System.out.println((i + 1) + ". " + seguros.get(i).getNombreSeguro());
                         }
                         System.out.print("Seleccione el número de seguro: ");
@@ -165,14 +216,12 @@ public class Principal {
                     }
 
                     try {
-                        
                         pacienteEncontrado.actualizarDatos(nuevaDireccion, nuevoSeguro);
                         System.out.println("¡Datos del paciente actualizados exitosamente!");
                     } catch (IllegalArgumentException e) {
                         System.out.println("Error de validación: " + e.getMessage());
                     }
                     break;
-                    // modificarPaciente();
                 case 0:
                     break;
                 default:
@@ -192,23 +241,33 @@ public class Principal {
             System.out.println("2. Listar medicos");
             System.out.println("3. Asignar especialidad");
             System.out.println("4. Modificar medico");
+            System.out.println("5. Desactivar medico");
             System.out.println("0. Volver");
 
             opcion = leerEntero("Opcion: ");
 
             switch (opcion) {
-            
+
                 case 1:
                     registrarMedico();
                     break;
                 case 2:
-                    // listarMedicos();
+                    if (medicos.isEmpty()) {
+                        System.out.println("No hay medicos registrados");
+                    } else {
+                        for (Medico m : medicos) {
+                            m.mostrarInformacion();
+                        }
+                    }
                     break;
                 case 3:
                     // asignarEspecialidad();
                     break;
                 case 4:
                     Medico.modificar(medicos, sc);
+                    break;
+                case 5:
+                    Medico.desactivar(medicos, citas, turnos, sc);
                     break;
                 case 0:
                     break;
@@ -320,13 +379,13 @@ public class Principal {
 
             switch (opcion) {
                 case 1:
-                    // registrarHorario();
+                    Horario.registrar(horarios, medicos, consultorios, sc);
                     break;
                 case 2:
                     // listarHorarios();
                     break;
                 case 3:
-                    // consultarHorariosMedico();
+                    Horario.consultarPorMedico(horarios, sc);
                     break;
                 case 4:
                     Turno.consultarPorEspecialidad(turnos, sc);
@@ -390,6 +449,7 @@ public class Principal {
             System.out.println("3. Confirmar cita");
             System.out.println("4. Cancelar cita");
             System.out.println("5. Filtrar citas por estado");
+            System.out.println("6. Consultar citas de un paciente");
             System.out.println("0. Volver");
 
             opcion = leerEntero("Opcion: ");
@@ -409,6 +469,9 @@ public class Principal {
                     break;
                 case 5:
                     Cita.filtrarPorEstado(citas, sc);
+                    break;
+                case 6:
+                    Cita.consultarPorPaciente(citas, sc);
                     break;
                 case 0:
                     break;

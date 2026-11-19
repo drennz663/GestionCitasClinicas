@@ -1,7 +1,7 @@
-
 package app;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -47,7 +47,7 @@ public class Horario {
     }
 
     public void setConsultorio(Consultorio consultorio) {
-        this.consultorio = Objects.requireNonNull( consultorio, "Consultorio obligatorio");
+        this.consultorio = Objects.requireNonNull(consultorio, "Consultorio obligatorio");
     }
 
     public int getDiaSemana() {
@@ -62,7 +62,7 @@ public class Horario {
     }
 
     public String getNombreDia() {
-        String[] dias = {"Lunes", "Martes", "Miercoles","Jueves", "Viernes", "Sabado", "Domingo"};
+        String[] dias = {"Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"};
 
         return dias[diaSemana - 1];
     }
@@ -84,143 +84,239 @@ public class Horario {
         this.horaFin = horaFin;
     }
 
-	// VALIDAR FORMATO DE HORA
-	public static LocalTime validarFormatoHora(Scanner sc, String mensaje) {
+    // ===== MÉTODOS DE Andy-web-lab =====
 
-		while (true) {
-			try {
-				System.out.print(mensaje);
-				return LocalTime.parse(sc.nextLine().trim());
+    public boolean seCruzaCon(Horario otro) {
+        return medico == otro.medico
+                && diaSemana == otro.diaSemana
+                && horaInicio.isBefore(otro.horaFin)
+                && horaFin.isAfter(otro.horaInicio);
+    }
 
-			} catch (java.time.format.DateTimeParseException e) {
-				System.out.println("Hora invalida. Ejemplo: 08:00");
-			}
-		}
-	}
+    public static void registrar(List<Horario> horarios, List<Medico> medicos,
+                                 List<Consultorio> consultorios, Scanner sc) {
+        if (medicos.isEmpty()) {
+            System.out.println("No hay medicos registrados");
+            return;
+        }
+        if (consultorios.isEmpty()) {
+            System.out.println("No hay consultorios registrados");
+            return;
+        }
 
-	// VALIDAR CRUCE CON OTROS HORARIOS
-	public static boolean validarCruce(List<Horario> horarios, Horario actual, int dia, LocalTime inicio, LocalTime fin) {
-		for (Horario h : horarios) {
-			if (h != actual && h.getMedico().getDni().equals(actual.getMedico().getDni()) 
-					&& h.getDiaSemana() == dia
-					&& inicio.isBefore(h.getHoraFin()) 
-					&& fin.isAfter(h.getHoraInicio())) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
+        System.out.print("DNI del medico: ");
+        String dni = sc.nextLine().trim();
 
-	
+        Medico medico = null;
+        for (Medico m : medicos) {
+            if (m.getDni().equals(dni)) {
+                medico = m;
+                break;
+            }
+        }
+        if (medico == null) {
+            System.out.println("Medico no encontrado");
+            return;
+        }
+        if (!medico.isActivo()) {
+            System.out.println("No se puede asignar horario a un medico inactivo");
+            return;
+        }
 
-	public static void modificarHorario(List<Medico> medicos, List<Horario> horarios, List<Turno> turnos, Scanner sc) {
-		// BUSCAR MEDICO
-		while (true) {
-			System.out.print("\nDNI del medico (0 para volver): ");
-			String dni = sc.nextLine().trim();
+        try {
+            for (int i = 0; i < consultorios.size(); i++) {
+                Consultorio c = consultorios.get(i);
+                System.out.println((i + 1) + ". " + c.getNombre() + " - " + c.getDistrito());
+            }
+            System.out.print("Consultorio (numero): ");
+            int pos = Integer.parseInt(sc.nextLine().trim());
+            if (pos < 1 || pos > consultorios.size()) {
+                System.out.println("Consultorio no valido");
+                return;
+            }
+            Consultorio consultorio = consultorios.get(pos - 1);
 
-			if (dni.equals("0"))
-				return;
+            System.out.print("Dia (1=Lunes ... 7=Domingo): ");
+            int dia = Integer.parseInt(sc.nextLine().trim());
+            System.out.print("Hora de inicio (HH:mm): ");
+            LocalTime inicio = LocalTime.parse(sc.nextLine().trim());
+            System.out.print("Hora de fin (HH:mm): ");
+            LocalTime fin = LocalTime.parse(sc.nextLine().trim());
 
-			if (!Persona.validarDNI(dni)) {
-				System.out.println("El DNI debe tener 8 digitos");
-				continue;
-			}
+            Horario nuevo = new Horario(medico, consultorio, dia, inicio, fin);
 
-			Medico medico = Medico.obtenerMedicoPorDNI(medicos, dni);
+            for (Horario h : horarios) {
+                if (h.seCruzaCon(nuevo)) {
+                    System.out.println("El horario se cruza con otro ya registrado para este medico");
+                    return;
+                }
+            }
 
-			if (medico == null) {
-				System.out.println("El medico no existe");
-				continue;
-			}
+            horarios.add(nuevo);
+            System.out.println("Horario registrado");
 
-			// OBTENER HORARIOS
-			List<Horario> encontrados = new ArrayList<>();
+        } catch (NumberFormatException | DateTimeParseException e) {
+            System.out.println("Formato invalido (use numeros y horas como 08:00)");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
 
-			for (Horario h : horarios) {
-				if (h.getMedico() == medico)
-					encontrados.add(h);
-			}
+    public static void consultarPorMedico(List<Horario> horarios, Scanner sc) {
+        System.out.print("DNI del medico: ");
+        String dni = sc.nextLine().trim();
 
-			if (encontrados.isEmpty()) {
-				System.out.println("El medico no tiene horarios");
-				continue;
-			}
+        boolean hay = false;
+        for (int dia = 1; dia <= 7; dia++) {
+            for (Horario h : horarios) {
+                if (h.medico.getDni().equals(dni) && h.diaSemana == dia) {
+                    System.out.println(h.getNombreDia() + ": "
+                            + h.horaInicio + " - " + h.horaFin
+                            + " | Consultorio: " + h.consultorio.getNombre());
+                    hay = true;
+                }
+            }
+        }
+        if (!hay) {
+            System.out.println("No hay horarios para ese medico");
+        }
+    }
 
-			// SELECCIONAR HORARIO
-			while (true) {
-				System.out.println("\n=== HORARIOS DEL MEDICO ===");
+    // ===== MÉTODOS DE desarrollo =====
 
-				for (int i = 0; i < encontrados.size(); i++) {
-					Horario h = encontrados.get(i);
-					System.out.println((i + 1) + ". " + h.getNombreDia() + " | " + h.getHoraInicio() + " - " + h.getHoraFin());
-				}
+    // VALIDAR FORMATO DE HORA
+    public static LocalTime validarFormatoHora(Scanner sc, String mensaje) {
+        while (true) {
+            try {
+                System.out.print(mensaje);
+                return LocalTime.parse(sc.nextLine().trim());
 
-				int opcion = Principal.leerEntero("Seleccione horario (0 para volver): ");
+            } catch (DateTimeParseException e) {
+                System.out.println("Hora invalida. Ejemplo: 08:00");
+            }
+        }
+    }
 
-				if (opcion == 0)
-					break;
+    // VALIDAR CRUCE CON OTROS HORARIOS
+    public static boolean validarCruce(List<Horario> horarios, Horario actual, int dia, LocalTime inicio, LocalTime fin) {
+        for (Horario h : horarios) {
+            if (h != actual && h.getMedico().getDni().equals(actual.getMedico().getDni())
+                    && h.getDiaSemana() == dia
+                    && inicio.isBefore(h.getHoraFin())
+                    && fin.isAfter(h.getHoraInicio())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-				if (opcion < 1 || opcion > encontrados.size()) {
-					System.out.println("Opcion invalida");
-					continue;
-				}
+    public static void modificarHorario(List<Medico> medicos, List<Horario> horarios, List<Turno> turnos, Scanner sc) {
+        // BUSCAR MEDICO
+        while (true) {
+            System.out.print("\nDNI del medico (0 para volver): ");
+            String dni = sc.nextLine().trim();
 
-				Horario horario = encontrados.get(opcion - 1);
+            if (dni.equals("0"))
+                return;
 
-				// VALIDAR TURNOS ASOCIADOS
-				boolean tieneTurnos = false;
+            if (!Persona.validarDNI(dni)) {
+                System.out.println("El DNI debe tener 8 digitos");
+                continue;
+            }
 
-				for (Turno t : turnos) {
-					if (t.getHorario() == horario) {
-						tieneTurnos = true;
-						break;
-					}
-				}
+            Medico medico = Medico.obtenerMedicoPorDNI(medicos, dni);
 
-				if (tieneTurnos) {
-					System.out.println("No se puede modificar: existen turnos asociados");
-					continue;
-				}
+            if (medico == null) {
+                System.out.println("El medico no existe");
+                continue;
+            }
 
-				// INGRESAR NUEVO HORARIO
-				int dia;
+            // OBTENER HORARIOS
+            List<Horario> encontrados = new ArrayList<>();
 
-				while (true) {
-					dia = Principal.leerEntero("Nuevo dia (1=Lunes, 7=Domingo): ");
+            for (Horario h : horarios) {
+                if (h.getMedico() == medico)
+                    encontrados.add(h);
+            }
 
-					if (dia >= 1 && dia <= 7)
-						break;
+            if (encontrados.isEmpty()) {
+                System.out.println("El medico no tiene horarios");
+                continue;
+            }
 
-					System.out.println("Dia invalido");
-				}
+            // SELECCIONAR HORARIO
+            while (true) {
+                System.out.println("\n=== HORARIOS DEL MEDICO ===");
 
-				LocalTime inicio, fin;
+                for (int i = 0; i < encontrados.size(); i++) {
+                    Horario h = encontrados.get(i);
+                    System.out.println((i + 1) + ". " + h.getNombreDia() + " | " + h.getHoraInicio() + " - " + h.getHoraFin());
+                }
 
-				while (true) {
-					inicio = validarFormatoHora(sc, "Hora inicio (HH:mm): ");
-					fin = validarFormatoHora(sc, "Hora fin (HH:mm): ");
+                int opcion = Principal.leerEntero("Seleccione horario (0 para volver): ");
 
-					if (inicio.isBefore(fin))
-						break;
+                if (opcion == 0)
+                    break;
 
-					System.out.println("La hora de inicio debe ser menor a la de fin");
-				}
+                if (opcion < 1 || opcion > encontrados.size()) {
+                    System.out.println("Opcion invalida");
+                    continue;
+                }
 
-				// VALIDAR CRUCES DE HORARIOS
-				if (validarCruce(horarios, horario, dia, inicio, fin)) {
-					System.out.println("El medico ya tiene un horario que se cruza");
-					continue;
-				}
+                Horario horario = encontrados.get(opcion - 1);
 
-				// GUARDAR CAMBIOS
-				horario.setDiaSemana(dia);
-				horario.setHoras(inicio, fin);
+                // VALIDAR TURNOS ASOCIADOS
+                boolean tieneTurnos = false;
 
-				System.out.println("\nHorario modificado correctamente");
-				System.out.println("Nuevo horario: " + horario.getNombreDia() + " | " + horario.getHoraInicio() + " - " + horario.getHoraFin());
-			}
-		}
-	}
+                for (Turno t : turnos) {
+                    if (t.getHorario() == horario) {
+                        tieneTurnos = true;
+                        break;
+                    }
+                }
+
+                if (tieneTurnos) {
+                    System.out.println("No se puede modificar: existen turnos asociados");
+                    continue;
+                }
+
+                // INGRESAR NUEVO HORARIO
+                int dia;
+
+                while (true) {
+                    dia = Principal.leerEntero("Nuevo dia (1=Lunes, 7=Domingo): ");
+
+                    if (dia >= 1 && dia <= 7)
+                        break;
+
+                    System.out.println("Dia invalido");
+                }
+
+                LocalTime inicio, fin;
+
+                while (true) {
+                    inicio = validarFormatoHora(sc, "Hora inicio (HH:mm): ");
+                    fin = validarFormatoHora(sc, "Hora fin (HH:mm): ");
+
+                    if (inicio.isBefore(fin))
+                        break;
+
+                    System.out.println("La hora de inicio debe ser menor a la de fin");
+                }
+
+                // VALIDAR CRUCES DE HORARIOS
+                if (validarCruce(horarios, horario, dia, inicio, fin)) {
+                    System.out.println("El medico ya tiene un horario que se cruza");
+                    continue;
+                }
+
+                // GUARDAR CAMBIOS
+                horario.setDiaSemana(dia);
+                horario.setHoras(inicio, fin);
+
+                System.out.println("\nHorario modificado correctamente");
+                System.out.println("Nuevo horario: " + horario.getNombreDia() + " | " + horario.getHoraInicio() + " - " + horario.getHoraFin());
+            }
+        }
+    }
 }

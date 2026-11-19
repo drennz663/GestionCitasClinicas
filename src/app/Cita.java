@@ -50,7 +50,7 @@ public class Cita {
     public LocalTime getHora() {
         return turno.getHoraInicio();
     }
-    
+
 
     public void setIdCita(int idCita) {
         if (idCita <= 0) {
@@ -75,11 +75,11 @@ public class Cita {
 
     public void setEstado(String estado) {
         if (estado == null ||
-            (!estado.equals("PROGRAMADA") &&
-             !estado.equals("CONFIRMADA") &&
-             !estado.equals("ATENDIDA") &&
-             !estado.equals("CANCELADA") &&
-             !estado.equals("NO ASISTIO"))) {
+                (!estado.equals("PROGRAMADA") &&
+                        !estado.equals("CONFIRMADA") &&
+                        !estado.equals("ATENDIDA") &&
+                        !estado.equals("CANCELADA") &&
+                        !estado.equals("NO ASISTIO"))) {
 
             throw new IllegalArgumentException("Estado de cita invalido");
         }
@@ -112,14 +112,35 @@ public class Cita {
     public static boolean tieneCita(List<Cita> citas, Turno turno) {
         for (Cita c : citas) {
             if (!c.getEstado().equals("CANCELADA") && !c.getEstado().equals("NO ASISTIO") &&
-                c.getMedico().getDni().equals(turno.getHorario().getMedico().getDni()) 
-                && c.getFecha().equals(turno.getFecha()) 
-                && turno.getHoraInicio().isBefore(c.getTurno().getHoraFin()) 
-                && turno.getHoraFin().isAfter(c.getHora())) {
+                    c.getMedico().getDni().equals(turno.getHorario().getMedico().getDni())
+                    && c.getFecha().equals(turno.getFecha())
+                    && turno.getHoraInicio().isBefore(c.getTurno().getHoraFin())
+                    && turno.getHoraFin().isAfter(c.getHora())) {
                 return true;
             }
         }
         return false;
+    }
+
+    public static void consultarPorPaciente(List<Cita> citas, Scanner sc) {
+        System.out.print("DNI del paciente: ");
+        String dni = sc.nextLine().trim();
+
+        boolean encontrada = false;
+        for (Cita c : citas) {
+            if (c.getPaciente().getDni().equals(dni)) {
+                System.out.println("Cita " + c.getIdCita()
+                        + " | " + c.getFecha() + " " + c.getHora()
+                        + " | Medico: " + c.getMedico().getNombreCompleto()
+                        + " | Consultorio: " + c.getConsultorio().getNombre()
+                        + " | Estado: " + c.getEstado());
+                encontrada = true;
+            }
+        }
+
+        if (!encontrada) {
+            System.out.println("No hay citas para ese paciente");
+        }
     }
 
 }
